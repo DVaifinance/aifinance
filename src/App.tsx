@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useInView } from '@/hooks/useInView'
 import {
   Banknote,
@@ -8,6 +8,7 @@ import {
   ChevronDown,
   Globe2,
   GraduationCap,
+  MessageCircle,
   MessageCircleMore,
 } from 'lucide-react'
 
@@ -36,7 +37,31 @@ function pad(value: number): string {
   return value.toString().padStart(2, '0')
 }
 
-const WA_NUMBER = '51999999999' // TODO: reemplazar con el numero real de WhatsApp
+const WA_NUMBER = '51951603568'
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string
+const STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/plantillas`
+
+// Ventana de oferta de 6 días que se fija en la primera visita y persiste entre
+// recargas (no se reinicia al refrescar la página).
+const OFFER_WINDOW_MS = 6 * 24 * 60 * 60 * 1000
+const OFFER_DEADLINE_KEY = 'aifinance:offer-deadline'
+
+function getOfferDeadline(): number {
+  if (typeof window === 'undefined') return Date.now() + OFFER_WINDOW_MS
+
+  const stored = window.localStorage.getItem(OFFER_DEADLINE_KEY)
+  const parsed = stored ? Number(stored) : NaN
+
+  // Reutiliza la fecha guardada mientras siga vigente; si no, abre una ventana nueva.
+  if (Number.isFinite(parsed) && parsed > Date.now()) {
+    return parsed
+  }
+
+  const deadline = Date.now() + OFFER_WINDOW_MS
+  window.localStorage.setItem(OFFER_DEADLINE_KEY, String(deadline))
+  return deadline
+}
 
 const credibilityItems = [
   {
@@ -45,7 +70,7 @@ const credibilityItems = [
   },
   {
     icon: GraduationCap,
-    label: 'Ingenieria Industrial PUCP',
+    label: 'Ingeniería Industrial PUCP',
   },
   {
     icon: BriefcaseBusiness,
@@ -53,16 +78,16 @@ const credibilityItems = [
   },
   {
     icon: Globe2,
-    label: 'Especialista en empresas de Latinoamerica',
+    label: 'Especialista en empresas de Latinoamérica',
   },
 ]
 
 const painPoints = [
-  'Confundes cuanto entra con cuanto ganas realmente',
+  'Confundes cuánto entra con cuánto ganas realmente',
   'Tu contador te da papeles que no entiendes',
-  'El banco te pidio estados financieros y no los tienes',
-  'No sabes si puedes contratar, invertir o pedir un prestamo',
-  'Terminas el mes sin saber por que no sobro dinero',
+  'El banco te pidió estados financieros y no los tienes',
+  'No sabes si puedes contratar, invertir o pedir un préstamo',
+  'Terminas el mes sin saber por qué no sobró dinero',
 ]
 
 const plans = [
@@ -70,61 +95,64 @@ const plans = [
     level: 'Nivel 01',
     name: 'FinanStart',
     tagline: 'Tu primer control financiero',
-    description: 'Deja de adivinar cuanto ganas.',
+    description: 'Deja de adivinar cuánto ganas.',
     regularPrice: 'S/98',
     offerPrice: 'S/49',
-    audience: 'Para ti si facturas hasta S/50k/anio',
+    audience: 'Para ti si facturas hasta S/50k/año',
     features: [
       'Registro mensual de ingresos y gastos',
-      'Estado de Resultados automatico',
-      'Balance General basico',
-      '5 indicadores clave con semaforo visual',
-      'Guia de uso en 3 pasos (lenguaje simple)',
+      'Estado de Resultados automático',
+      'Balance General básico',
+      '5 indicadores clave con semáforo visual',
+      'Guía de uso en 3 pasos (lenguaje simple)',
     ],
-    bonus: 'Bonus gratis: Guia PDF explicativa',
+    bonus: 'Bonus gratis: Guía PDF explicativa',
     cta: 'Quiero FinanStart',
+    downloadUrl: `${STORAGE_BASE}/TEST1.xlsx`,
     featured: false,
   },
   {
     level: 'Nivel 02',
     name: 'FinanPro',
-    tagline: 'Control y proyeccion para negocios en expansion',
-    description: 'Sabe adonde va tu dinero.',
+    tagline: 'Control y proyección para negocios en expansión',
+    description: 'Sabe adónde va tu dinero.',
     regularPrice: 'S/218',
     offerPrice: 'S/109',
-    audience: 'Para ti si facturas S/50k-S/150k/anio',
+    audience: 'Para ti si facturas S/50k-S/150k/año',
     features: [
       'Todo lo de FinanStart +',
       'EE.RR con estructura PCGE completa',
       'Balance General avanzado',
       'Flujo de caja proyectado a 3 meses',
-      '10 ratios financieros con semaforo',
-      'Dashboard visual con 2 graficos en Excel',
-      'Comparativo mes anterior automatico',
+      '10 ratios financieros con semáforo',
+      'Dashboard visual con 2 gráficos en Excel',
+      'Comparativo mes anterior automático',
     ],
-    bonus: 'Bonus gratis: Guia PDF explicativa',
+    bonus: 'Bonus gratis: Guía PDF explicativa',
     cta: 'Quiero FinanPro',
+    downloadUrl: `${STORAGE_BASE}/MEDIO.xlsx`,
     featured: false,
   },
   {
     level: 'Nivel 03',
     name: 'FinanDirectivo',
     tagline: 'Finanzas de alta gerencia',
-    description: 'La vision financiera que tienen las grandes empresas, ahora en la tuya.',
+    description: 'La visión financiera que tienen las grandes empresas, ahora en la tuya.',
     regularPrice: 'S/358',
     offerPrice: 'S/179',
-    audience: 'Para ti si facturas mas de S/150k/anio',
+    audience: 'Para ti si facturas más de S/150k/año',
     features: [
       'Todo lo de FinanPro +',
-      'EE.RR 12 meses + comparativo anio anterior',
-      'Flujo de caja operativo, inversion y financiamiento',
-      '15 ratios con semaforo visual',
-      'Dashboard ejecutivo con 4 graficos en Excel',
-      'Hoja de presentacion bancaria lista para imprimir',
-      'Dashboard web interactivo con URL publica (Apps Script)',
+      'EE.RR 12 meses + comparativo año anterior',
+      'Flujo de caja operativo, inversión y financiamiento',
+      '15 ratios con semáforo visual',
+      'Dashboard ejecutivo con 4 gráficos en Excel',
+      'Hoja de presentación bancaria lista para imprimir',
+      'Dashboard web interactivo con URL pública (Apps Script)',
     ],
-    bonus: 'Bonus gratis: Guia PDF + Dashboard Web con URL publica',
+    bonus: 'Bonus gratis: Guía PDF + Dashboard Web con URL pública',
     cta: 'Quiero FinanDirectivo',
+    downloadUrl: `${STORAGE_BASE}/CARO.xlsx`,
     featured: true,
   },
 ]
@@ -147,58 +175,58 @@ const comparisonRows = [
     values: ['5', '10', '15'],
   },
   {
-    feature: 'Dashboard Excel con graficos',
+    feature: 'Dashboard Excel con gráficos',
     values: ['dash', 'check', 'check'],
   },
   {
-    feature: 'Hoja presentacion bancaria',
+    feature: 'Hoja presentación bancaria',
     values: ['dash', 'dash', 'check'],
   },
   {
-    feature: 'Dashboard web con URL publica',
+    feature: 'Dashboard web con URL pública',
     values: ['dash', 'dash', 'check'],
   },
   {
-    feature: 'Guia PDF explicativa',
+    feature: 'Guía PDF explicativa',
     values: ['check', 'check', 'check'],
   },
 ]
 
 const profileHighlights = [
-  'Ex-BBVA Peru',
+  'Ex-BBVA Perú',
   'Ex-Interbank',
   'PUCP Ing. Industrial',
-  'Head of Finance · Agroexportacion',
+  'Head of Finance · Agroexportación',
   'Especialista LATAM',
-  'Diplomado Corp. Finance · Pacifico',
-  'Diplomado Agroexportacion · SNI',
+  'Diplomado Corp. Finance · Pacífico',
+  'Diplomado Agroexportación · SNI',
 ]
 
 const faqs = [
   {
-    question: 'Necesito saber contabilidad para usar las plantillas?',
+    question: '¿Necesito saber contabilidad para usar las plantillas?',
     answer:
-      'No. Estan disenadas para empresarios, no para contadores. Cada campo tiene instrucciones claras y la guia PDF te explica paso a paso que ingresar y como interpretar los resultados. Si sabes usar Excel basico, puedes usarlas.',
+      'No. Están diseñadas para empresarios, no para contadores. Cada campo tiene instrucciones claras y la guía PDF te explica paso a paso qué ingresar y cómo interpretar los resultados. Si sabes usar Excel básico, puedes usarlas.',
   },
   {
-    question: 'Funcionan con Google Sheets?',
+    question: '¿Funcionan con Google Sheets?',
     answer:
-      'Si. Las plantillas se entregan en formato .xlsx, compatible tanto con Microsoft Excel como con Google Sheets. Las formulas y los graficos funcionan en ambas plataformas.',
+      'Sí. Las plantillas se entregan en formato .xlsx, compatible tanto con Microsoft Excel como con Google Sheets. Las fórmulas y los gráficos funcionan en ambas plataformas.',
   },
   {
-    question: 'Que incluye el dashboard web de FinanDirectivo?',
+    question: '¿Qué incluye el dashboard web de FinanDirectivo?',
     answer:
-      'Incluye una vista web ejecutiva con indicadores clave, graficos y una URL publica para revisar tus numeros sin abrir el Excel. Es ideal para seguimiento gerencial y presentacion rapida.',
+      'Incluye una vista web ejecutiva con indicadores clave, gráficos y una URL pública para revisar tus números sin abrir el Excel. Es ideal para seguimiento gerencial y presentación rápida.',
   },
   {
-    question: 'Como recibo la plantilla despues de comprar?',
+    question: '¿Cómo recibo la plantilla después de comprar?',
     answer:
-      'Inmediatamente despues del pago recibes un enlace de descarga por WhatsApp o email con el archivo Excel, la guia PDF y, en FinanDirectivo, los archivos del dashboard web. La entrega es instantanea.',
+      'Inmediatamente después del pago recibes un enlace de descarga por WhatsApp o email con el archivo Excel, la guía PDF y, en FinanDirectivo, los archivos del dashboard web. La entrega es instantánea.',
   },
   {
-    question: 'El precio de 50% OFF es permanente?',
+    question: '¿El precio de 50% OFF es permanente?',
     answer:
-      'No. Es una oferta de lanzamiento valida solo esta semana. El precio normal de FinanStart es S/98, FinanPro S/218 y FinanDirectivo S/358. Una vez terminada la oferta, el precio vuelve a su valor normal sin excepciones.',
+      'No. Es una oferta de lanzamiento válida solo esta semana. El precio normal de FinanStart es S/98, FinanPro S/218 y FinanDirectivo S/358. Una vez terminada la oferta, el precio vuelve a su valor normal sin excepciones.',
   },
 ]
 
@@ -223,8 +251,46 @@ function renderComparisonValue(value: string, featured = false) {
   )
 }
 
+function Countdown({
+  label,
+  time,
+  cellClassName,
+}: {
+  label: string
+  time: RemainingTime
+  cellClassName: string
+}) {
+  const units: { value: number; label: string }[] = [
+    { value: time.days, label: 'Días' },
+    { value: time.hours, label: 'Horas' },
+    { value: time.minutes, label: 'Min' },
+    { value: time.seconds, label: 'Seg' },
+  ]
+
+  return (
+    <>
+      <p className="mb-3 text-xs font-semibold tracking-[0.18em] text-amber-200/90 uppercase">
+        {label}
+      </p>
+
+      <div className="grid grid-cols-4 gap-2 sm:gap-3">
+        {units.map((unit) => (
+          <div key={unit.label} className={cellClassName}>
+            <p className="text-2xl font-bold text-amber-300 tabular-nums sm:text-4xl">
+              {pad(unit.value)}
+            </p>
+            <p className="text-[11px] tracking-[0.16em] text-zinc-300 uppercase">
+              {unit.label}
+            </p>
+          </div>
+        ))}
+      </div>
+    </>
+  )
+}
+
 function App() {
-  const targetDate = useMemo(() => Date.now() + 6 * 24 * 60 * 60 * 1000, [])
+  const [targetDate] = useState(getOfferDeadline)
   const [remainingTime, setRemainingTime] = useState<RemainingTime>(() =>
     getRemainingTime(targetDate),
   )
@@ -260,7 +326,7 @@ function App() {
         <section className="mx-auto flex min-h-[calc(100vh-84px)] w-full max-w-7xl items-center justify-center px-5 pb-14 pt-6 sm:px-8 sm:pb-20">
           <div className="w-full max-w-4xl text-center">
           <p className="reveal mx-auto inline-flex items-center rounded-full border border-amber-300/40 bg-amber-200/8 px-4 py-2 text-xs font-semibold tracking-[0.15em] text-amber-200/95 sm:text-sm">
-            Oferta de lanzamiento - 50% off
+            Oferta de lanzamiento · 50% OFF
           </p>
 
           <h1 className="reveal reveal-delay-1 mt-8 font-display text-[2.35rem] leading-tight tracking-tight text-[#f4f0e6] sm:text-[4rem] sm:leading-[0.95] md:text-[5.4rem]">
@@ -271,53 +337,20 @@ function App() {
 
           <p className="reveal reveal-delay-2 mx-auto mt-8 max-w-2xl text-base leading-relaxed text-zinc-300 sm:text-xl">
             Plantillas profesionales para que empresarios peruanos entiendan sus
-            numeros, controlen su negocio y lleguen al banco con datos que
+            números, controlen su negocio y lleguen al banco con datos que
             impresionan.
           </p>
 
           <div className="reveal reveal-delay-3 mx-auto mt-10 max-w-xl rounded-2xl border border-emerald-300/15 bg-black/20 p-4 shadow-[0_20px_70px_-35px_rgba(0,0,0,0.8)]">
-            <p className="mb-3 text-xs font-semibold tracking-[0.18em] text-amber-200/90 uppercase">
-              La oferta termina en
-            </p>
-
-            <div className="grid grid-cols-4 gap-2 sm:gap-3">
-              <div className="rounded-xl border border-emerald-200/15 bg-[#122b23] p-2 sm:p-3">
-                <p className="text-2xl font-bold text-amber-300 sm:text-4xl">
-                  {pad(remainingTime.days)}
-                </p>
-                <p className="text-[11px] tracking-[0.16em] text-zinc-300 uppercase">
-                  Dias
-                </p>
-              </div>
-              <div className="rounded-xl border border-emerald-200/15 bg-[#122b23] p-2 sm:p-3">
-                <p className="text-2xl font-bold text-amber-300 sm:text-4xl">
-                  {pad(remainingTime.hours)}
-                </p>
-                <p className="text-[11px] tracking-[0.16em] text-zinc-300 uppercase">
-                  Horas
-                </p>
-              </div>
-              <div className="rounded-xl border border-emerald-200/15 bg-[#122b23] p-2 sm:p-3">
-                <p className="text-2xl font-bold text-amber-300 sm:text-4xl">
-                  {pad(remainingTime.minutes)}
-                </p>
-                <p className="text-[11px] tracking-[0.16em] text-zinc-300 uppercase">
-                  Min
-                </p>
-              </div>
-              <div className="rounded-xl border border-emerald-200/15 bg-[#122b23] p-2 sm:p-3">
-                <p className="text-2xl font-bold text-amber-300 sm:text-4xl">
-                  {pad(remainingTime.seconds)}
-                </p>
-                <p className="text-[11px] tracking-[0.16em] text-zinc-300 uppercase">
-                  Seg
-                </p>
-              </div>
-            </div>
+            <Countdown
+              label="La oferta termina en"
+              time={remainingTime}
+              cellClassName="rounded-xl border border-emerald-200/15 bg-[#122b23] p-2 sm:p-3"
+            />
           </div>
 
           <p className="reveal reveal-delay-4 mx-auto mt-4 inline-flex rounded-xl bg-red-500 px-4 py-2 text-xs font-semibold text-white sm:text-sm">
-            Descuento del 50% - Solo esta semana - Precio sube el domingo
+            Descuento del 50% · Solo esta semana · El precio sube pronto
           </p>
 
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -330,7 +363,7 @@ function App() {
             <Button
               variant="outline"
               className="h-12 rounded-xl border-zinc-300/25 bg-transparent px-8 text-base text-zinc-100 hover:bg-zinc-100/10"
-              onClick={() => window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Hola David, quisiera ver un demo de las plantillas')}`, '_blank')}
+              onClick={() => window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Hola David, quisiera ver un demo de las plantillas')}`, '_blank', 'noopener,noreferrer')}
             >
               Ver demo de plantillas
             </Button>
@@ -358,7 +391,7 @@ function App() {
                 El problema
               </p>
               <h2 className="mt-5 max-w-2xl font-display text-4xl leading-tight text-[#f4f0e6] sm:text-5xl">
-                Te identificas con alguna de estas situaciones?
+                ¿Te identificas con alguna de estas situaciones?
               </h2>
 
               <div className="mt-8 divide-y divide-emerald-200/10 rounded-[1.75rem] border border-emerald-200/10 bg-black/8">
@@ -367,7 +400,10 @@ function App() {
                     key={item}
                     className="flex items-center gap-4 px-4 py-5 text-left text-base text-zinc-200 sm:px-6 sm:text-[1.05rem]"
                   >
-                    <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-amber-300/12 text-lg ring-1 ring-amber-300/15">
+                    <div
+                      aria-hidden="true"
+                      className="flex size-9 shrink-0 items-center justify-center rounded-full bg-amber-300/12 text-lg ring-1 ring-amber-300/15"
+                    >
                       {index === 0 && '😵'}
                       {index === 1 && '📄'}
                       {index === 2 && '🏦'}
@@ -382,21 +418,21 @@ function App() {
 
             <aside className="reveal reveal--right rounded-[2rem] border border-amber-200/20 bg-[linear-gradient(180deg,rgba(34,74,58,0.95),rgba(13,43,35,0.95))] p-7 shadow-[0_25px_80px_-45px_rgba(0,0,0,0.85)] sm:p-9">
               <h3 className="max-w-md font-display text-3xl leading-tight text-amber-300 sm:text-4xl">
-                La solucion ya existe y cuesta menos que una hora de consultoria
+                La solución ya existe y cuesta menos que una hora de consultoría
               </h3>
 
               <p className="mt-6 text-lg leading-relaxed text-zinc-200/90">
-                Estas plantillas estan disenadas por un profesional con
-                experiencia en banca corporativa para que tu mismo
+                Estas plantillas están diseñadas por un profesional con
+                experiencia en banca corporativa para que tú mismo
                 <span className="font-semibold text-amber-300">
-                  {' '}puedas entender tus numeros
+                  {' '}puedas entender tus números
                 </span>{' '}
                 en menos de 10 minutos al mes.
               </p>
 
               <p className="mt-6 text-lg leading-relaxed text-zinc-300">
-                Sin jerga contable. Sin depender de nadie. Con semaforos que te
-                dicen exactamente que esta bien y que necesita tu atencion.
+                Sin jerga contable. Sin depender de nadie. Con semáforos que te
+                dicen exactamente qué está bien y qué necesita tu atención.
               </p>
 
               <div className="mt-8 rounded-2xl border border-amber-200/10 bg-amber-300/8 p-5 text-base font-semibold leading-relaxed text-amber-200">
@@ -419,7 +455,7 @@ function App() {
             </p>
             <h2 className="mx-auto mt-5 max-w-5xl font-display text-4xl leading-tight text-[#f4f0e6] sm:text-5xl lg:text-6xl">
               Tres niveles.
-              <span className="text-amber-300"> Una sola decision.</span>
+              <span className="text-amber-300"> Una sola decisión.</span>
             </h2>
           </div>
 
@@ -428,15 +464,15 @@ function App() {
               <article
                 key={plan.name}
                 className={[
-                  `reveal reveal--scale reveal-delay-${i + 1} relative flex h-full flex-col rounded-[2rem] border p-7 shadow-[0_30px_90px_-55px_rgba(0,0,0,0.95)] backdrop-blur-sm sm:p-8`,
+                  `reveal reveal--scale reveal-delay-${i + 1} relative flex h-full flex-col rounded-[2rem] border p-7 shadow-[0_30px_90px_-55px_rgba(0,0,0,0.95)] backdrop-blur-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_40px_110px_-50px_rgba(0,0,0,0.95)] sm:p-8`,
                   plan.featured
-                    ? 'border-amber-300/35 bg-[linear-gradient(180deg,rgba(30,78,58,0.95),rgba(9,38,31,0.98))]'
-                    : 'border-emerald-200/15 bg-[linear-gradient(180deg,rgba(24,68,52,0.92),rgba(10,34,28,0.96))]',
+                    ? 'border-amber-300/50 bg-[linear-gradient(180deg,rgba(30,78,58,0.95),rgba(9,38,31,0.98))] ring-1 ring-amber-300/30 xl:scale-[1.04]'
+                    : 'border-emerald-200/15 bg-[linear-gradient(180deg,rgba(24,68,52,0.92),rgba(10,34,28,0.96))] hover:border-emerald-200/30',
                 ].join(' ')}
               >
                 {plan.featured ? (
                   <div className="absolute right-4 top-0 -translate-y-1/2 rounded-b-xl rounded-t-md bg-amber-300 px-4 py-2 text-xs font-black tracking-[0.12em] text-emerald-950 uppercase shadow-lg">
-                    Mas vendido
+                    Más vendido
                   </div>
                 ) : null}
 
@@ -490,9 +526,8 @@ function App() {
                 </div>
 
                 <a
-                  href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(`Hola David, quiero adquirir ${plan.name} (${plan.offerPrice})`)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href={plan.downloadUrl}
+                  download
                   className="mt-6 flex flex-1 items-end"
                 >
                   <Button
@@ -517,7 +552,7 @@ function App() {
               Compara
             </p>
             <h2 className="mx-auto mt-5 max-w-4xl font-display text-4xl leading-tight text-[#f4f0e6] sm:text-5xl">
-              Cual es la
+              ¿Cuál es la
               <span className="text-amber-300"> diferencia?</span>
             </h2>
           </div>
@@ -525,7 +560,7 @@ function App() {
           <div className="reveal reveal-delay-1 mt-10 overflow-hidden rounded-[2rem] border border-emerald-200/12 bg-[linear-gradient(180deg,rgba(19,59,46,0.94),rgba(8,31,25,0.98))] shadow-[0_30px_90px_-55px_rgba(0,0,0,0.9)]">
             <div className="hidden grid-cols-[1.3fr_0.7fr_0.7fr_0.9fr] border-b border-emerald-200/10 bg-white/4 md:grid">
               <div className="px-5 py-5 text-left text-lg font-black tracking-[0.05em] text-amber-300 uppercase">
-                Funcion
+                Función
               </div>
               <div className="px-4 py-5 text-center">
                 <p className="text-lg font-black text-amber-300 uppercase">FinanStart</p>
@@ -584,12 +619,15 @@ function App() {
 
         <section className="mx-auto w-full max-w-7xl px-5 pb-24 sm:px-8 sm:pb-32">
           <div className="reveal reveal--scale rounded-[2.25rem] border border-emerald-200/12 bg-[radial-gradient(circle_at_top,rgba(28,82,61,0.34),transparent_42%),linear-gradient(180deg,rgba(17,52,40,0.96),rgba(7,28,22,0.98))] px-6 py-12 text-center shadow-[0_35px_100px_-60px_rgba(0,0,0,0.95)] sm:px-12 sm:py-16">
-            <div className="mx-auto flex size-24 items-center justify-center rounded-full bg-amber-300 text-5xl shadow-[0_18px_40px_-15px_rgba(251,191,36,0.5)]">
+            <div
+              aria-hidden="true"
+              className="mx-auto flex size-24 items-center justify-center rounded-full bg-amber-300 text-5xl shadow-[0_18px_40px_-15px_rgba(251,191,36,0.5)]"
+            >
               👨
             </div>
 
             <h2 className="mt-8 font-display text-4xl leading-tight text-[#f4f0e6] sm:text-5xl">
-              David Ricardo Brito Sanchez
+              David Ricardo Brito Sánchez
             </h2>
 
             <p className="mt-4 text-sm font-black tracking-[0.08em] text-amber-300 uppercase sm:text-lg">
@@ -597,10 +635,10 @@ function App() {
             </p>
 
             <p className="mx-auto mt-8 max-w-4xl text-lg leading-relaxed text-zinc-200/90 sm:text-2xl">
-              Con experiencia en banca corporativa en BBVA Peru e Interbank,
-              formacion en Ingenieria Industrial en la PUCP y actual Head of
-              Finance de una empresa agroexportadora, disene estas plantillas
-              para que cualquier empresario en Latinoamerica tenga acceso a las
+              Con experiencia en banca corporativa en BBVA Perú e Interbank,
+              formación en Ingeniería Industrial en la PUCP y actual Head of
+              Finance de una empresa agroexportadora, diseñé estas plantillas
+              para que cualquier empresario en Latinoamérica tenga acceso a las
               mismas herramientas que usan las grandes empresas sin necesitar un
               equipo de finanzas.
             </p>
@@ -638,12 +676,15 @@ function App() {
                   <button
                     type="button"
                     onClick={() => setOpenFaqIndex(isOpen ? -1 : index)}
+                    aria-expanded={isOpen}
+                    aria-controls={`faq-answer-${index}`}
                     className="flex w-full items-center justify-between gap-4 px-1 py-4 text-left"
                   >
                     <span className="text-xl font-bold text-[#f4f0e6] sm:text-2xl">
                       {faq.question}
                     </span>
                     <ChevronDown
+                      aria-hidden="true"
                       className={[
                         'size-5 shrink-0 text-amber-300 transition-transform duration-200',
                         isOpen ? 'rotate-180' : '',
@@ -652,7 +693,10 @@ function App() {
                   </button>
 
                   {isOpen ? (
-                    <div className="px-1 pb-4 pt-1 text-lg leading-relaxed text-zinc-300 sm:pb-6 sm:text-xl">
+                    <div
+                      id={`faq-answer-${index}`}
+                      className="px-1 pb-4 pt-1 text-lg leading-relaxed text-zinc-300 sm:pb-6 sm:text-xl"
+                    >
                       <p className="max-w-5xl">{faq.answer}</p>
                     </div>
                   ) : null}
@@ -666,52 +710,19 @@ function App() {
           <div className="mx-auto max-w-6xl px-5 py-20 text-center sm:px-8 sm:py-28">
             <h2 className="reveal mx-auto max-w-5xl font-display text-5xl leading-tight tracking-tight text-[#f4f0e6] sm:text-6xl sm:leading-[0.95] md:text-7xl">
               Tu negocio merece
-              <span className="mt-3 block text-amber-300">numeros claros</span>
+              <span className="mt-3 block text-amber-300">números claros</span>
             </h2>
 
             <p className="reveal reveal-delay-1 mx-auto mt-8 max-w-3xl text-lg leading-relaxed text-zinc-300 sm:text-2xl">
-              Empieza hoy. En menos de una hora tendras tu primer control financiero profesional.
+              Empieza hoy. En menos de una hora tendrás tu primer control financiero profesional.
             </p>
 
-              <div className="reveal reveal-delay-2 mx-auto mt-10 max-w-xl rounded-2xl border border-emerald-300/15 bg-black/25 p-4 shadow-[0_20px_70px_-35px_rgba(0,0,0,0.8)]">
-              <p className="mb-3 text-xs font-semibold tracking-[0.18em] text-amber-200/90 uppercase">
-                El precio sube en
-              </p>
-
-              <div className="grid grid-cols-4 gap-2 sm:gap-3">
-                <div className="rounded-xl border border-emerald-200/15 bg-[#112d25] p-2 sm:p-3">
-                  <p className="text-2xl font-bold text-amber-300 sm:text-4xl">
-                    {pad(remainingTime.days)}
-                  </p>
-                  <p className="text-[11px] tracking-[0.16em] text-zinc-300 uppercase">
-                    Dias
-                  </p>
-                </div>
-                <div className="rounded-xl border border-emerald-200/15 bg-[#112d25] p-2 sm:p-3">
-                  <p className="text-2xl font-bold text-amber-300 sm:text-4xl">
-                    {pad(remainingTime.hours)}
-                  </p>
-                  <p className="text-[11px] tracking-[0.16em] text-zinc-300 uppercase">
-                    Horas
-                  </p>
-                </div>
-                <div className="rounded-xl border border-emerald-200/15 bg-[#112d25] p-2 sm:p-3">
-                  <p className="text-2xl font-bold text-amber-300 sm:text-4xl">
-                    {pad(remainingTime.minutes)}
-                  </p>
-                  <p className="text-[11px] tracking-[0.16em] text-zinc-300 uppercase">
-                    Min
-                  </p>
-                </div>
-                <div className="rounded-xl border border-emerald-200/15 bg-[#112d25] p-2 sm:p-3">
-                  <p className="text-2xl font-bold text-amber-300 sm:text-4xl">
-                    {pad(remainingTime.seconds)}
-                  </p>
-                  <p className="text-[11px] tracking-[0.16em] text-zinc-300 uppercase">
-                    Seg
-                  </p>
-                </div>
-              </div>
+            <div className="reveal reveal-delay-2 mx-auto mt-10 max-w-xl rounded-2xl border border-emerald-300/15 bg-black/25 p-4 shadow-[0_20px_70px_-35px_rgba(0,0,0,0.8)]">
+              <Countdown
+                label="El precio sube en"
+                time={remainingTime}
+                cellClassName="rounded-xl border border-emerald-200/15 bg-[#112d25] p-2 sm:p-3"
+              />
             </div>
 
             <div className="reveal reveal-delay-3 mx-auto mt-10 flex max-w-3xl flex-col gap-4 sm:flex-row">
@@ -738,7 +749,7 @@ function App() {
             </div>
 
             <p className="mx-auto mt-8 max-w-4xl text-sm leading-relaxed text-zinc-400 sm:text-lg">
-              ✓ Entrega inmediata · ✓ Compatible Excel y Google Sheets · ✓ Soporte por WhatsApp
+              ✓ Entrega inmediata · ✓ Compatible con Excel y Google Sheets · ✓ Soporte por WhatsApp
             </p>
           </div>
 
@@ -747,11 +758,22 @@ function App() {
               <span className="text-amber-300">David Brito · AI Finance</span> · VCONN SAC · RUC 20611177977 · dr.britos79@gmail.com
             </p>
             <p className="mt-2 text-sm text-zinc-400 sm:text-base">
-              © 2025 Todos los derechos reservados · Lima, Peru
+              © 2025 Todos los derechos reservados · Lima, Perú
             </p>
           </footer>
         </section>
       </main>
+
+      <a
+        href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Hola David, tengo una consulta sobre las plantillas financieras')}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Consultar por WhatsApp"
+        className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-[#25d366] px-4 py-3 font-semibold text-emerald-950 shadow-[0_12px_30px_-8px_rgba(37,211,102,0.6)] transition-transform hover:scale-105 sm:bottom-6 sm:right-6"
+      >
+        <MessageCircle className="size-6" aria-hidden="true" />
+        <span className="hidden sm:inline">WhatsApp</span>
+      </a>
     </div>
   )
 }
