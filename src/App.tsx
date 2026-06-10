@@ -306,7 +306,7 @@ function App() {
   }, [targetDate])
 
   return (
-    <div className="relative min-h-screen bg-[#0a1f18] text-[#f4f0e6]">
+    <div className="relative min-h-screen bg-[#0F2A22] text-[#FFFFFF]">
 
       <header className="relative z-10 mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-5 sm:px-8">
         <p className="text-sm tracking-[0.18em] text-amber-300/95 sm:text-base">
@@ -329,7 +329,7 @@ function App() {
             Oferta de lanzamiento · 50% OFF
           </p>
 
-          <h1 className="reveal reveal-delay-1 mt-8 font-display text-[2.35rem] leading-tight tracking-tight text-[#f4f0e6] sm:text-[4rem] sm:leading-[0.95] md:text-[5.4rem]">
+          <h1 className="reveal reveal-delay-1 mt-8 font-display text-[2.35rem] leading-tight tracking-tight text-[#FFFFFF] sm:text-[4rem] sm:leading-[0.95] md:text-[5.4rem]">
             Las herramientas financieras que usan
             <span className="mt-2 block text-amber-300">las grandes empresas</span>
             <span className="mt-2 block">ahora en la tuya</span>
@@ -390,7 +390,7 @@ function App() {
               <p className="text-xs font-semibold tracking-[0.22em] text-amber-300 uppercase">
                 El problema
               </p>
-              <h2 className="mt-5 max-w-2xl font-display text-4xl leading-tight text-[#f4f0e6] sm:text-5xl">
+              <h2 className="mt-5 max-w-2xl font-display text-4xl leading-tight text-[#FFFFFF] sm:text-5xl">
                 ¿Te identificas con alguna de estas situaciones?
               </h2>
 
@@ -453,7 +453,7 @@ function App() {
             <p className="text-xs font-semibold tracking-[0.22em] text-amber-300 uppercase">
               Elige tu plantilla
             </p>
-            <h2 className="mx-auto mt-5 max-w-5xl font-display text-4xl leading-tight text-[#f4f0e6] sm:text-5xl lg:text-6xl">
+            <h2 className="mx-auto mt-5 max-w-5xl font-display text-4xl leading-tight text-[#FFFFFF] sm:text-5xl lg:text-6xl">
               Tres niveles.
               <span className="text-amber-300"> Una sola decisión.</span>
             </h2>
@@ -480,7 +480,7 @@ function App() {
                   {plan.level}
                 </p>
 
-                <h3 className="mt-5 font-display text-4xl text-[#f4f0e6] sm:text-[2.8rem]">
+                <h3 className="mt-5 font-display text-4xl text-[#FFFFFF] sm:text-[2.8rem]">
                   {plan.name}
                 </h3>
 
@@ -551,7 +551,7 @@ function App() {
             <p className="text-xs font-semibold tracking-[0.22em] text-amber-300 uppercase">
               Compara
             </p>
-            <h2 className="mx-auto mt-5 max-w-4xl font-display text-4xl leading-tight text-[#f4f0e6] sm:text-5xl">
+            <h2 className="mx-auto mt-5 max-w-4xl font-display text-4xl leading-tight text-[#FFFFFF] sm:text-5xl">
               ¿Cuál es la
               <span className="text-amber-300"> diferencia?</span>
             </h2>
@@ -580,7 +580,7 @@ function App() {
               {comparisonRows.map((row) => (
                 <div key={row.feature}>
                   <div className="px-5 py-4 text-left md:hidden">
-                    <p className="text-base font-bold text-[#f4f0e6]">{row.feature}</p>
+                    <p className="text-base font-bold text-[#FFFFFF]">{row.feature}</p>
                     <div className="mt-4 grid grid-cols-3 gap-3">
                       <div className="rounded-xl border border-emerald-200/8 bg-black/10 p-3 text-center">
                         <p className="text-[11px] font-bold tracking-[0.14em] text-zinc-400 uppercase">
@@ -604,7 +604,7 @@ function App() {
                   </div>
 
                   <div className="hidden grid-cols-[1.3fr_0.7fr_0.7fr_0.9fr] items-center md:grid">
-                    <div className="px-5 py-5 text-left text-xl font-semibold text-[#f4f0e6]">
+                    <div className="px-5 py-5 text-left text-xl font-semibold text-[#FFFFFF]">
                       {row.feature}
                     </div>
                     <div className="px-4 py-5 text-center">{renderComparisonValue(row.values[0])}</div>
@@ -626,7 +626,7 @@ function App() {
               👨
             </div>
 
-            <h2 className="mt-8 font-display text-4xl leading-tight text-[#f4f0e6] sm:text-5xl">
+            <h2 className="mt-8 font-display text-4xl leading-tight text-[#FFFFFF] sm:text-5xl">
               David Ricardo Brito Sánchez
             </h2>
 
@@ -661,7 +661,7 @@ function App() {
             <p className="text-xs font-semibold tracking-[0.22em] text-amber-300 uppercase">
               Preguntas frecuentes
             </p>
-            <h2 className="mx-auto mt-5 max-w-4xl font-display text-4xl leading-tight text-[#f4f0e6] sm:text-5xl">
+            <h2 className="mx-auto mt-5 max-w-4xl font-display text-4xl leading-tight text-[#FFFFFF] sm:text-5xl">
               Todo lo que necesitas
               <span className="text-amber-300"> saber</span>
             </h2>
@@ -680,7 +680,7 @@ function App() {
                     aria-controls={`faq-answer-${index}`}
                     className="flex w-full items-center justify-between gap-4 px-1 py-4 text-left"
                   >
-                    <span className="text-xl font-bold text-[#f4f0e6] sm:text-2xl">
+                    <span className="text-xl font-bold text-[#FFFFFF] sm:text-2xl">
                       {faq.question}
                     </span>
                     <ChevronDown
@@ -708,7 +708,7 @@ function App() {
 
         <section className="border-t border-amber-200/10 bg-[#07160f]">
           <div className="mx-auto max-w-6xl px-5 py-20 text-center sm:px-8 sm:py-28">
-            <h2 className="reveal mx-auto max-w-5xl font-display text-5xl leading-tight tracking-tight text-[#f4f0e6] sm:text-6xl sm:leading-[0.95] md:text-7xl">
+            <h2 className="reveal mx-auto max-w-5xl font-display text-5xl leading-tight tracking-tight text-[#FFFFFF] sm:text-6xl sm:leading-[0.95] md:text-7xl">
               Tu negocio merece
               <span className="mt-3 block text-amber-300">números claros</span>
             </h2>

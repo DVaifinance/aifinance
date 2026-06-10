@@ -1,0 +1,9 @@
+<!-- Logotipo principal · dorado sobre transparente (para fondos verde oscuro) -->
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="120" viewBox="0 0 440 120" fill="none">
+  <text x="220" y="62" text-anchor="middle"
+        font-family="Outfit, system-ui, -apple-system, sans-serif"
+        font-size="58" font-weight="800" letter-spacing="-1" fill="#EBBA58">DAVID BRITO</text>
+  <text x="220" y="104" text-anchor="middle"
+        font-family="Outfit, system-ui, -apple-system, sans-serif"
+        font-size="36" font-weight="600" letter-spacing="11" fill="#EBBA58">AI FINANCE</text>
+</svg>

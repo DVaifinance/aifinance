@@ -1,0 +1,9 @@
+<!-- Imagotipo DB · variante verde para fondos claros (Verde sobre blanco) -->
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="120" viewBox="0 0 160 120" fill="none">
+  <text x="80" y="76" text-anchor="middle"
+        font-family="Outfit, system-ui, -apple-system, sans-serif"
+        font-size="84" font-weight="800" letter-spacing="-3" fill="#0F2A22">DB</text>
+  <text x="80" y="104" text-anchor="middle"
+        font-family="Outfit, system-ui, -apple-system, sans-serif"
+        font-size="19" font-weight="600" letter-spacing="6" fill="#0F2A22">AI FINANCE</text>
+</svg>
