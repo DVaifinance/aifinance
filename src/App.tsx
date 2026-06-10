@@ -769,7 +769,7 @@ function App() {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Consultar por WhatsApp"
-        className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-[#25d366] px-4 py-3 font-semibold text-emerald-950 shadow-[0_12px_30px_-8px_rgba(37,211,102,0.6)] transition-transform hover:scale-105 sm:bottom-6 sm:right-6"
+        className="fixed bottom-5 left-5 z-50 flex items-center gap-2 rounded-full bg-[#25d366] px-4 py-3 font-semibold text-emerald-950 shadow-[0_12px_30px_-8px_rgba(37,211,102,0.6)] transition-transform hover:scale-105 sm:bottom-6 sm:left-6"
       >
         <MessageCircle className="size-6" aria-hidden="true" />
         <span className="hidden sm:inline">WhatsApp</span>
