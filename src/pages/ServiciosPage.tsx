@@ -412,7 +412,7 @@ function ServiciosPage() {
     getRemainingTime(targetDate),
   )
   const [openFaqIndex, setOpenFaqIndex] = useState<number>(0)
-  const [paidPlanName] = useState<string | null>(getApprovedPlanName)
+  const [paidPlanName, setPaidPlanName] = useState<string | null>(getApprovedPlanName)
   useInView()
 
   useEffect(() => {
@@ -445,6 +445,13 @@ function ServiciosPage() {
       window.history.replaceState({}, '', window.location.pathname)
     }
   }, [])
+
+  // Oculta el banner de pago aprobado automáticamente tras unos segundos.
+  useEffect(() => {
+    if (!paidPlanName) return
+    const timeoutId = setTimeout(() => setPaidPlanName(null), 10000)
+    return () => clearTimeout(timeoutId)
+  }, [paidPlanName])
 
   // Inicia el cobro en Mercado Pago. Si el plan aún no tiene link configurado,
   // hace descarga directa (modo prueba) para no bloquear el flujo.
@@ -499,7 +506,15 @@ function ServiciosPage() {
 
       <main className="relative z-10">
         {paidPlanName ? (
-          <div className="fixed inset-x-4 top-4 z-50 mx-auto max-w-xl rounded-2xl border border-emerald-700/30 bg-emerald-600 px-5 py-4 text-center shadow-[0_20px_60px_-30px_rgba(15,42,34,0.6)] sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2">
+          <div className="fixed inset-x-4 top-4 z-50 mx-auto max-w-xl rounded-2xl border border-emerald-700/30 bg-emerald-600 px-5 py-4 pr-10 text-center shadow-[0_20px_60px_-30px_rgba(15,42,34,0.6)] sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2">
+            <button
+              type="button"
+              onClick={() => setPaidPlanName(null)}
+              aria-label="Cerrar"
+              className="absolute right-3 top-3 flex size-6 items-center justify-center rounded-full text-white/80 transition hover:bg-white/15 hover:text-white"
+            >
+              ✕
+            </button>
             <p className="text-sm font-semibold text-white sm:text-base">
               ✓ Pago aprobado. Descargando tu plantilla <span className="text-amber-200">{paidPlanName}</span>…
             </p>
