@@ -25,6 +25,11 @@ const RESEND_FROM =
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
+// Solo para PRUEBAS: si se define, todos los correos se envían a esta dirección
+// en vez de al email (ficticio) del comprador de sandbox. Déjalo vacío en
+// producción para enviar al comprador real.
+const TEST_EMAIL_OVERRIDE = Deno.env.get('TEST_EMAIL_OVERRIDE')
+
 const STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/plantillas`
 const CALENDLY_URL = 'https://calendly.com/estrategia-dbaifinance'
 
@@ -121,7 +126,9 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 5) Enviar el correo con Resend.
+    // 5) Enviar el correo con Resend. En pruebas, TEST_EMAIL_OVERRIDE redirige
+    //    todo a tu correo real (el de sandbox es ficticio y Resend lo rechaza).
+    const recipient = TEST_EMAIL_OVERRIDE || email
     const { subject, html } = buildEmail(product)
     const sendRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -131,7 +138,7 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         from: RESEND_FROM,
-        to: email,
+        to: recipient,
         subject,
         html,
         ...(attachments ? { attachments } : {}),
@@ -139,6 +146,8 @@ Deno.serve(async (req) => {
     })
 
     if (!sendRes.ok) {
+      const errText = await sendRes.text()
+      console.error(`Resend falló (${sendRes.status}): ${errText}`)
       // Liberar el claim para permitir el reintento de MP.
       await fetch(
         `${SUPABASE_URL}/rest/v1/sent_emails?payment_id=eq.${paymentId}`,
@@ -150,10 +159,10 @@ Deno.serve(async (req) => {
           },
         },
       )
-      return json(500, { error: `Resend falló: ${await sendRes.text()}` })
+      return json(500, { error: `Resend falló: ${errText}` })
     }
 
-    return json(200, { sent: email, product: ref })
+    return json(200, { sent: recipient, product: ref })
   } catch (e) {
     return json(500, { error: String(e) })
   }
