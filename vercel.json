@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/politica-privacidad", "destination": "/politica-privacidad/index.html" },
+    { "source": "/politica-privacidad/", "destination": "/politica-privacidad/index.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
