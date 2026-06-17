@@ -7,6 +7,23 @@
 @theme {
   --font-display: 'Outfit', sans-serif;
   --font-sans: 'Outfit', sans-serif;
+
+  /* ── Identidad de marca David Brito · AI Finance ──
+     Manual de Identidad Corporativa:
+       Dorado  #EBBA58  ·  Verde  #0F2A22  ·  Gris  #484848
+     La escala `amber-*` de Tailwind se remapea a una rampa monocromática
+     del dorado de marca para que todo acento use el color oficial #EBBA58
+     (los pasos 500/600 son versiones más oscuras del mismo dorado, solo
+     para mantener legibilidad sobre fondos claros). */
+  --color-brand-gold: #EBBA58;
+  --color-brand-green: #0F2A22;
+  --color-brand-graphite: #484848;
+
+  --color-amber-200: #F0C877;
+  --color-amber-300: #EBBA58;
+  --color-amber-400: #EBBA58;
+  --color-amber-500: #C99A3C;
+  --color-amber-600: #A87E28;
 }
 
 :root {

@@ -1,0 +1,8 @@
+# Página legal estática: servir el HTML real ANTES del fallback SPA,
+# tanto con como sin barra final.
+/politica-privacidad        /politica-privacidad/index.html   200
+/politica-privacidad/       /politica-privacidad/index.html   200
+
+# SPA fallback: sirve index.html para rutas del cliente (ej. /servicios).
+# Los archivos estáticos reales tienen prioridad sobre esta regla.
+/*    /index.html   200
