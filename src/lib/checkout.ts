@@ -10,4 +10,4 @@ export const CALENDLY_URL = 'https://calendly.com/estrategia-dbaifinance'
 // La URL de retorno apunta a /servicios?asesoria=express (lógica en ServiciosPage).
 export const ASESORIA_EXPRESS_PRICE = 'S/59'
 export const ASESORIA_EXPRESS_LINK =
-  'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-4a773717-2b90-4839-b124-c43bbdba63a5'
+  'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-a6d2b306-f8e8-4c52-b83e-8098f753e69d'

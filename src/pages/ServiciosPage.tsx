@@ -65,11 +65,11 @@ const PAYMENT_LINKS: Record<string, string> = {
   // los links de producción cuando salgas a vivo. La URL de retorno apunta a
   // /servicios?plan=<slug>, que es donde vive la lógica de descarga.
   finanstart:
-    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-8e715809-2849-4bcd-950e-a0d50398ef78',
+    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-795fafcf-5009-48d3-96c9-ec3ec14c52ea',
   finanpro:
-    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-e29e3f66-48e2-46f5-8101-f0353686e39f',
+    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-f965745f-36b0-47dd-a6c2-96d70b99c8c6',
   finandirectivo:
-    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-247546a3-681a-43b7-a1e0-57c10dbf6ee8',
+    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-9efc0987-a19f-4414-b5cd-9a598d3cebb3',
 }
 
 // Fuerza la descarga del archivo. Intenta vía blob (renombra el archivo) y, si
