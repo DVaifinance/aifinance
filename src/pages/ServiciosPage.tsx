@@ -171,7 +171,7 @@ const plans = [
     ],
     bonus: 'Bonus gratis: Guía PDF explicativa',
     cta: 'Quiero FinanStart',
-    downloadUrl: `${STORAGE_BASE}/TEST1.xlsx`,
+    downloadUrl: `${STORAGE_BASE}/BASICO.xlsx`,
     featured: false,
   },
   {
@@ -194,7 +194,7 @@ const plans = [
     ],
     bonus: 'Bonus gratis: Guía PDF explicativa',
     cta: 'Quiero FinanPro',
-    downloadUrl: `${STORAGE_BASE}/MEDIO.xlsx`,
+    downloadUrl: `${STORAGE_BASE}/MEDIANO.xlsx`,
     featured: true,
   },
   {
@@ -217,7 +217,7 @@ const plans = [
     ],
     bonus: 'Bonus gratis: Guía PDF + Dashboard Web con URL pública',
     cta: 'Quiero FinanDirectivo',
-    downloadUrl: `${STORAGE_BASE}/CARO.xlsx`,
+    downloadUrl: `${STORAGE_BASE}/PRO.xlsx`,
     featured: false,
   },
 ]
