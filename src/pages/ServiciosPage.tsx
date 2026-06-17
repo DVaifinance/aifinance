@@ -442,12 +442,8 @@ function ServiciosPage() {
       return
     }
 
-    if (status === 'approved' && planSlug) {
-      const plan = plans.find((p) => p.slug === planSlug)
-      if (plan) {
-        triggerDownload(plan.downloadUrl, `${plan.name}.xlsx`)
-      }
-    }
+    // Plantilla pagada: NO se descarga aquí; la enviamos por correo (webhook).
+    // El banner solo confirma el pago y avisa que llegará al correo.
 
     if (status || planSlug || asesoria) {
       window.history.replaceState({}, '', window.location.pathname)
@@ -531,21 +527,10 @@ function ServiciosPage() {
               ✕
             </button>
             <p className="text-sm font-semibold text-white sm:text-base">
-              ✓ Pago aprobado. Descargando tu plantilla <span className="text-amber-200">{paidPlanName}</span>…
+              ✓ Pago aprobado. Te enviamos tu plantilla <span className="text-amber-200">{paidPlanName}</span> al correo.
             </p>
             <p className="mt-1 text-xs text-emerald-50/90">
-              Si la descarga no inicia,{' '}
-              <button
-                type="button"
-                onClick={() => {
-                  const plan = plans.find((p) => p.name === paidPlanName)
-                  if (plan) triggerDownload(plan.downloadUrl, `${plan.name}.xlsx`)
-                }}
-                className="font-semibold text-amber-200 underline underline-offset-2"
-              >
-                haz clic aquí
-              </button>
-              .
+              Revisa tu bandeja de entrada (y la carpeta de spam) en los próximos minutos.
             </p>
           </div>
         ) : null}
