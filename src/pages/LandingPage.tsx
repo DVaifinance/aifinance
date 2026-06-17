@@ -18,8 +18,8 @@ import {
 
 import { Button } from '@/components/ui/button'
 import { useInView } from '@/hooks/useInView'
+import { ASESORIA_EXPRESS_LINK } from '@/lib/checkout'
 
-const CALENDLY_URL = 'https://calendly.com/estrategia-dbaifinance'
 const EMAIL = 'estrategia@dbaifinance.com'
 const PHONE_DISPLAY = '+51 907 979 298'
 const WA_NUMBER = '51907979298'
@@ -191,14 +191,13 @@ function LandingPage() {
             ))}
           </nav>
 
-          <a href={CALENDLY_URL} target="_blank" rel="noopener noreferrer">
-            <Button
-              className="h-10 rounded-xl bg-[#0F2A22] px-4 text-sm font-semibold text-white transition hover:bg-[#15392c]"
-              size="lg"
-            >
-              Agendar tu consulta express
-            </Button>
-          </a>
+          <Button
+            onClick={() => window.location.assign(ASESORIA_EXPRESS_LINK)}
+            className="h-10 rounded-xl bg-[#0F2A22] px-4 text-sm font-semibold text-white transition hover:bg-[#15392c]"
+            size="lg"
+          >
+            Agendar tu consulta express
+          </Button>
         </header>
 
         {/* ── HERO ── */}
@@ -222,11 +221,12 @@ function LandingPage() {
             </p>
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <a href={CALENDLY_URL} target="_blank" rel="noopener noreferrer">
-                <Button className="h-12 w-full rounded-xl bg-[#0F2A22] px-7 text-base font-semibold text-white hover:bg-[#15392c] sm:w-auto">
-                  Agendar tu consulta express
-                </Button>
-              </a>
+              <Button
+                onClick={() => window.location.assign(ASESORIA_EXPRESS_LINK)}
+                className="h-12 w-full rounded-xl bg-[#0F2A22] px-7 text-base font-semibold text-white hover:bg-[#15392c] sm:w-auto"
+              >
+                Agendar tu consulta express
+              </Button>
               <Button
                 className="h-12 w-full rounded-xl bg-zinc-200/80 px-7 text-base font-semibold text-[#0F2A22] hover:bg-zinc-200 sm:w-auto"
                 onClick={() => scrollToId('servicios')}
@@ -234,6 +234,10 @@ function LandingPage() {
                 Ver Servicios
               </Button>
             </div>
+
+            <p className="mt-4 text-sm text-emerald-900/65">
+              Consulta express · <span className="font-bold text-amber-600">S/59</span>
+            </p>
 
             <div className="mt-10 grid max-w-lg grid-cols-3 gap-6 border-t border-emerald-900/10 pt-8">
               {heroStats.map((stat) => (
