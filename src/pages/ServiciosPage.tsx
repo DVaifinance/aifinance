@@ -60,9 +60,15 @@ const STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/plantillas`
 // exitoso, y este sitio disparará la descarga de la plantilla correspondiente.
 // Mientras un link esté vacío, el botón hará descarga directa (modo prueba).
 const PAYMENT_LINKS: Record<string, string> = {
-  finanstart: '', // TODO: link de pago de FinanStart
-  finanpro: '', // TODO: link de pago de FinanPro
-  finandirectivo: '', // TODO: link de pago de FinanDirectivo
+  // PRUEBA (sandbox de Mercado Pago): paga con tarjetas de prueba. Reemplaza por
+  // los links de producción cuando salgas a vivo. La URL de retorno apunta a
+  // /servicios?plan=<slug>, que es donde vive la lógica de descarga.
+  finanstart:
+    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-8e715809-2849-4bcd-950e-a0d50398ef78',
+  finanpro:
+    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-e29e3f66-48e2-46f5-8101-f0353686e39f',
+  finandirectivo:
+    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-247546a3-681a-43b7-a1e0-57c10dbf6ee8',
 }
 
 // Fuerza la descarga del archivo. Intenta vía blob (renombra el archivo) y, si
