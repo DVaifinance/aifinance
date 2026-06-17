@@ -920,7 +920,7 @@ function ServiciosPage() {
                       </div>
                     </div>
 
-                    <div className="mt-6 flex flex-1 flex-col justify-end gap-2">
+                    <div className="mt-6 flex flex-1 items-end">
                       <Button
                         onClick={handleAsesoriaExpress}
                         className="h-13 w-full rounded-2xl border-2 border-[#0F2A22]/15 bg-transparent px-6 text-base font-black text-[#0F2A22] hover:bg-[#0F2A22]/5"
@@ -928,10 +928,6 @@ function ServiciosPage() {
                         Solicitar este servicio
                         <ArrowRight className="size-4" />
                       </Button>
-                      <p className="text-center text-xs leading-relaxed text-emerald-900/55">
-                        Pago inicial de S/59. El monto final del servicio se define
-                        en la sesión.
-                      </p>
                     </div>
                   </article>
                 )
