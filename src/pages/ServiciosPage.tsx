@@ -20,11 +20,7 @@ import {
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import {
-  ASESORIA_EXPRESS_LINK,
-  ASESORIA_EXPRESS_PRICE,
-  CALENDLY_URL,
-} from '@/lib/checkout'
+import { CALENDLY_URL } from '@/lib/checkout'
 
 type RemainingTime = {
   days: number
@@ -458,13 +454,6 @@ function ServiciosPage() {
     }
   }, [])
 
-  // Inicia el cobro de la asesoría express (S/59) en Mercado Pago. Al aprobarse
-  // el pago, el cliente vuelve a /servicios?asesoria=express y se le redirige a
-  // Calendly. El monto real del servicio se define dentro de la asesoría.
-  function handleAsesoriaExpress() {
-    window.location.assign(ASESORIA_EXPRESS_LINK)
-  }
-
   // Oculta el banner de pago aprobado automáticamente tras unos segundos.
   useEffect(() => {
     if (!paidPlanName) return
@@ -593,12 +582,6 @@ function ServiciosPage() {
               onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
             >
               Quiero la oferta
-            </Button>
-            <Button
-              className="h-12 rounded-xl bg-zinc-200/80 px-8 text-base font-semibold text-[#0F2A22] hover:bg-zinc-200"
-              onClick={() => window.open(`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Hola David, quisiera ver un demo de las plantillas')}`, '_blank', 'noopener,noreferrer')}
-            >
-              Ver demo de plantillas
             </Button>
           </div>
           </div>
@@ -930,17 +913,20 @@ function ServiciosPage() {
                       </div>
                     </div>
 
-                    <div className="mt-6 flex flex-1 flex-col justify-end gap-2">
-                      <Button
-                        onClick={handleAsesoriaExpress}
-                        className="h-13 w-full rounded-2xl border-2 border-[#0F2A22]/15 bg-transparent px-6 text-base font-black text-[#0F2A22] hover:bg-[#0F2A22]/5"
+                    <div className="mt-6 flex flex-1 items-end">
+                      <a
+                        href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(
+                          `Hola David, me interesa el servicio "${service.title}" (${service.code}). ¿Podemos conversar?`,
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex w-full"
                       >
-                        Agendar asesoría express · {ASESORIA_EXPRESS_PRICE}
-                        <ArrowRight className="size-4" />
-                      </Button>
-                      <p className="text-center text-xs leading-relaxed text-emerald-900/55">
-                        El monto del servicio se define dentro de la asesoría.
-                      </p>
+                        <Button className="h-13 w-full rounded-2xl border-2 border-[#0F2A22]/15 bg-transparent px-6 text-base font-black text-[#0F2A22] hover:bg-[#0F2A22]/5">
+                          Solicitar este servicio
+                          <ArrowRight className="size-4" />
+                        </Button>
+                      </a>
                     </div>
                   </article>
                 )
