@@ -187,6 +187,7 @@ const plans = [
       'Manual_FinanStart_DB_AiFinance.2026.V4.pdf',
     ],
     featured: false,
+    comingSoon: false,
   },
   {
     level: 'Nivel 02',
@@ -210,6 +211,7 @@ const plans = [
     cta: 'Quiero FinanPro',
     files: ['MEDIANO.xlsx'],
     featured: true,
+    comingSoon: false,
   },
   {
     level: 'Nivel 03',
@@ -233,6 +235,7 @@ const plans = [
     cta: 'Quiero FinanDirectivo',
     files: ['PRO.xlsx'],
     featured: false,
+    comingSoon: true,
   },
 ]
 
@@ -753,17 +756,31 @@ function ServiciosPage() {
                 </div>
 
                 <div className="mt-6 flex flex-1 items-end">
-                  <Button
-                    onClick={() => handleBuy(plan)}
-                    className={[
-                      'h-14 w-full rounded-2xl border-2 px-6 text-base font-black tracking-[0.02em] sm:text-lg',
-                      plan.featured
-                        ? 'border-amber-300 bg-amber-400 text-emerald-950 hover:bg-amber-300'
-                        : 'border-[#0F2A22]/15 bg-transparent text-[#0F2A22] hover:bg-[#0F2A22]/5',
-                    ].join(' ')}
-                  >
-                    {plan.cta} {'->'}
-                  </Button>
+                  {plan.comingSoon ? (
+                    <div className="w-full">
+                      <Button
+                        disabled
+                        className="h-14 w-full cursor-not-allowed rounded-2xl border-2 border-[#0F2A22]/10 bg-[#0F2A22]/5 px-6 text-base font-black tracking-[0.02em] text-[#0F2A22]/40 sm:text-lg"
+                      >
+                        Próximamente
+                      </Button>
+                      <p className="mt-2 text-center text-xs font-semibold text-emerald-900/45">
+                        🚧 Estamos terminando esta plantilla. Disponible muy pronto.
+                      </p>
+                    </div>
+                  ) : (
+                    <Button
+                      onClick={() => handleBuy(plan)}
+                      className={[
+                        'h-14 w-full rounded-2xl border-2 px-6 text-base font-black tracking-[0.02em] sm:text-lg',
+                        plan.featured
+                          ? 'border-amber-300 bg-amber-400 text-emerald-950 hover:bg-amber-300'
+                          : 'border-[#0F2A22]/15 bg-transparent text-[#0F2A22] hover:bg-[#0F2A22]/5',
+                      ].join(' ')}
+                    >
+                      {plan.cta} {'->'}
+                    </Button>
+                  )}
                 </div>
               </article>
             ))}
