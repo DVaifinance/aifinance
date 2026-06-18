@@ -6,8 +6,9 @@ export const CALENDLY_URL = 'https://calendly.com/estrategia-dbaifinance'
 // pago, el sitio lo redirige a Calendly para agendar. El monto real de cada
 // servicio de Nivel 2 se define DENTRO de esa asesoría.
 //
-// PRUEBA (sandbox). Reemplaza por el link de producción al salir a vivo.
+// PRODUCCIÓN (cobro real) — temporalmente a S/2 PARA PRUEBAS. Yape excluido.
 // La URL de retorno apunta a /servicios?asesoria=express (lógica en ServiciosPage).
+// Regenera el link a S/59 cuando termines de probar.
 export const ASESORIA_EXPRESS_PRICE = 'S/59'
 export const ASESORIA_EXPRESS_LINK =
-  'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-a6d2b306-f8e8-4c52-b83e-8098f753e69d'
+  'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-d67c8d4f-0d96-47f7-80cf-c4149cdf520c'
