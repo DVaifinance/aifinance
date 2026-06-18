@@ -17,10 +17,11 @@ import {
   MessageCircleMore,
   Scale,
   Sparkles,
+  Target,
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { ASESORIA_EXPRESS_LINK, CALENDLY_URL } from '@/lib/checkout'
+import { startDiagnosticoCheckout } from '@/lib/checkout'
 
 type RemainingTime = {
   days: number
@@ -451,13 +452,6 @@ function ServiciosPage() {
     const params = new URLSearchParams(window.location.search)
     const status = params.get('status') ?? params.get('collection_status')
     const planSlug = params.get('plan')
-    const asesoria = params.get('asesoria')
-
-    // Asesoría express pagada → llevar a Calendly para agendar.
-    if (status === 'approved' && asesoria === 'express') {
-      window.location.assign(CALENDLY_URL)
-      return
-    }
 
     // Plantilla pagada → descargar los archivos del plan correspondiente.
     if (status === 'approved' && planSlug) {
@@ -467,16 +461,16 @@ function ServiciosPage() {
       }
     }
 
-    if (status || planSlug || asesoria) {
+    if (status || planSlug) {
       window.history.replaceState({}, '', window.location.pathname)
     }
   }, [])
 
-  // Inicia el cobro de la asesoría express (S/59) en Mercado Pago. Al aprobarse
-  // el pago, el cliente vuelve a /servicios?asesoria=express y se le redirige a
-  // Calendly. El monto real del servicio se define dentro de la asesoría.
+  // Inicia el cobro del Diagnóstico Financiero Express. La edge function crea la
+  // preferencia con back_urls + auto_return hacia la página externa, así que MP
+  // redirige solo al cliente tras pagar (no vuelve por /servicios).
   function handleAsesoriaExpress() {
-    window.location.assign(ASESORIA_EXPRESS_LINK)
+    void startDiagnosticoCheckout()
   }
 
   // Oculta el banner de pago aprobado automáticamente tras unos segundos.
@@ -878,6 +872,70 @@ function ServiciosPage() {
               </p>
             </div>
 
+            <div className="reveal reveal-delay-1 mx-auto mt-12 max-w-5xl overflow-hidden rounded-[2.25rem] border border-amber-300/40 bg-white shadow-[0_30px_80px_-55px_rgba(15,42,34,0.45)]">
+              <div className="grid lg:grid-cols-[1.35fr_1fr]">
+                {/* CUADRO 1 · HOOK + VALOR */}
+                <div className="border-b border-emerald-900/8 p-7 sm:p-9 lg:border-b-0 lg:border-r">
+                  <p className="inline-flex items-center gap-2 rounded-full bg-amber-300/25 px-4 py-2 text-xs font-bold tracking-[0.1em] text-emerald-950 uppercase">
+                    <Target className="size-4 text-amber-600" /> Empieza por aquí
+                  </p>
+                  <h3 className="mt-5 font-display text-3xl leading-tight text-[#0F2A22]">
+                    Diagnóstico Financiero Express
+                  </h3>
+                  <p className="mt-3 text-lg leading-relaxed text-emerald-900/75">
+                    Antes de contratar cualquier plan, conoce tu empresa como la ve
+                    un banco.
+                  </p>
+
+                  <p className="mt-6 text-sm font-bold tracking-[0.06em] text-amber-700 uppercase">
+                    Recibes en menos de 12 horas
+                  </p>
+                  <ul className="mt-3 space-y-0.5">
+                    {[
+                      'Brief Ejecutivo con tus ratios financieros clave',
+                      'Análisis de tu deuda en el sistema financiero (Infocorp + Sentinel)',
+                      'Semáforo de Bancabilidad y hoja de ruta personalizada',
+                      'Sesión 1:1 de hasta 45 min para explicar hallazgos',
+                    ].map((item) => (
+                      <li
+                        key={item}
+                        className="flex items-start gap-3 border-b border-emerald-900/8 py-3 text-base leading-relaxed text-emerald-900/80"
+                      >
+                        <Check className="mt-1 size-4 shrink-0 text-amber-500" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* CUADRO 2 · PRECIO + CTA */}
+                <div className="flex flex-col justify-center bg-[#0F2A22] p-7 text-white sm:p-9">
+                  <div className="flex items-end gap-3">
+                    <span className="font-sans text-5xl font-black tracking-tight">S/59</span>
+                    <span className="mb-1.5 text-2xl font-bold text-white/40 line-through">S/118</span>
+                  </div>
+                  <p className="mt-3 inline-flex w-fit items-center gap-2 rounded-full bg-amber-400 px-3 py-1.5 text-xs font-black tracking-[0.08em] text-emerald-950 uppercase">
+                    <Sparkles className="size-3.5" /> 50% OFF · Solo junio 2026
+                  </p>
+                  <p className="mt-5 text-sm leading-relaxed text-white/70">
+                    Aplicable como crédito a tu Plan de Negocio Integral, Plan
+                    Financiero Bancario o Reestructuración de Deuda.
+                  </p>
+
+                  <Button
+                    onClick={handleAsesoriaExpress}
+                    className="mt-7 h-13 w-full rounded-2xl bg-amber-400 px-6 text-base font-black text-emerald-950 hover:bg-amber-300"
+                  >
+                    Solicitar mi Diagnóstico Express
+                    <ArrowRight className="size-4" />
+                  </Button>
+                  <p className="mt-4 text-center text-sm italic leading-relaxed text-white/60">
+                    El punto de partida para decisiones con claridad, no con intuición.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <div className="mt-12 grid gap-6 lg:grid-cols-3 lg:gap-5">
               {puntualServices.map((service, i) => {
                 const Icon = service.icon
@@ -944,10 +1002,10 @@ function ServiciosPage() {
                     <div className="mt-6 flex flex-1 items-end">
                       <Button
                         onClick={handleAsesoriaExpress}
-                        className="h-13 w-full rounded-2xl border-2 border-[#0F2A22]/15 bg-transparent px-6 text-base font-black text-[#0F2A22] hover:bg-[#0F2A22]/5"
+                        className="h-13 w-full gap-1.5 rounded-2xl border-2 border-[#0F2A22]/15 bg-transparent px-3 text-sm font-black text-[#0F2A22] hover:bg-[#0F2A22]/5"
                       >
-                        Solicitar este servicio
-                        <ArrowRight className="size-4" />
+                        Solicitar Diagnóstico Financiero Express
+                        <ArrowRight className="size-4 shrink-0" />
                       </Button>
                     </div>
                   </article>

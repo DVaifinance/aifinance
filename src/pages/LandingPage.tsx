@@ -18,7 +18,7 @@ import {
 
 import { Button } from '@/components/ui/button'
 import { useInView } from '@/hooks/useInView'
-import { ASESORIA_EXPRESS_LINK } from '@/lib/checkout'
+import { startDiagnosticoCheckout } from '@/lib/checkout'
 
 const EMAIL = 'estrategia@dbaifinance.com'
 const PHONE_DISPLAY = '+51 907 979 298'
@@ -192,11 +192,11 @@ function LandingPage() {
           </nav>
 
           <Button
-            onClick={() => window.location.assign(ASESORIA_EXPRESS_LINK)}
+            onClick={() => void startDiagnosticoCheckout()}
             className="h-10 rounded-xl bg-[#0F2A22] px-4 text-sm font-semibold text-white transition hover:bg-[#15392c]"
             size="lg"
           >
-            Agendar tu consulta express
+            Diagnóstico Financiero Express
           </Button>
         </header>
 
@@ -222,10 +222,10 @@ function LandingPage() {
 
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Button
-                onClick={() => window.location.assign(ASESORIA_EXPRESS_LINK)}
+                onClick={() => void startDiagnosticoCheckout()}
                 className="h-12 w-full rounded-xl bg-[#0F2A22] px-7 text-base font-semibold text-white hover:bg-[#15392c] sm:w-auto"
               >
-                Agendar tu consulta express
+                Diagnóstico Financiero Express
               </Button>
               <Button
                 className="h-12 w-full rounded-xl bg-zinc-200/80 px-7 text-base font-semibold text-[#0F2A22] hover:bg-zinc-200 sm:w-auto"
@@ -580,9 +580,15 @@ function LandingPage() {
                 </div>
               </div>
 
-              <div className="mt-8 border-t border-emerald-900/10 pt-8 text-center">
-                <a href={`mailto:${EMAIL}`} className="inline-flex">
-                  <Button className="h-13 rounded-xl bg-[#0F2A22] px-8 text-base font-bold text-white hover:bg-[#15392c]">
+              <div className="mt-8 flex flex-col items-center gap-3 border-t border-emerald-900/10 pt-8 text-center sm:flex-row sm:justify-center">
+                <Button
+                  onClick={() => void startDiagnosticoCheckout()}
+                  className="h-13 w-full rounded-xl bg-[#0F2A22] px-8 text-base font-bold text-white hover:bg-[#15392c] sm:w-auto"
+                >
+                  Diagnóstico Financiero Express
+                </Button>
+                <a href={`mailto:${EMAIL}`} className="inline-flex w-full sm:w-auto">
+                  <Button className="h-13 w-full rounded-xl border-2 border-[#0F2A22]/15 bg-transparent px-8 text-base font-bold text-[#0F2A22] hover:bg-[#0F2A22]/5 sm:w-auto">
                     Enviar Correo Ahora
                   </Button>
                 </a>

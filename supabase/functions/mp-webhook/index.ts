@@ -34,9 +34,8 @@ const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 const TEST_EMAIL_OVERRIDE = Deno.env.get('TEST_EMAIL_OVERRIDE')
 
 const STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/plantillas`
-const CALENDLY_URL = 'https://calendly.com/estrategia-dbaifinance'
 
-type Product = { name: string; files?: string[]; calendly?: boolean }
+type Product = { name: string; files?: string[] }
 
 // external_reference (definido al crear la preferencia) → producto.
 // `files` deben coincidir con los nombres en el bucket `plantillas` y con los
@@ -57,7 +56,9 @@ const PRODUCTS: Record<string, Product> = {
     ],
   },
   finandirectivo: { name: 'FinanDirectivo', files: ['PRO.xlsx'] },
-  'asesoria-express': { name: 'Asesoría Express', calendly: true },
+  // El Diagnóstico Financiero Express (external_reference 'asesoria-express') ya
+  // NO se gestiona aquí: el agendamiento y la confirmación viven en la página
+  // externa (back_urls + auto_return de mp-checkout). El webhook lo ignora.
 }
 
 function json(status: number, body: unknown): Response {
@@ -193,33 +194,6 @@ Deno.serve(async (req) => {
 function buildEmail(
   product: Product,
 ): { subject: string; html: string; text: string } {
-  if (product.calendly) {
-    return {
-      subject: `Pago confirmado: ${product.name} · David Brito AI Finance`,
-      html: `
-        <div style="font-family:Arial,Helvetica,sans-serif;line-height:1.6;color:#0F2A22">
-          <p>Hola,</p>
-          <p>Confirmamos tu pago de la <strong>${product.name}</strong>. Gracias por tu compra.</p>
-          <p>Agenda tu sesión en el siguiente enlace:</p>
-          <p>
-            <a href="${CALENDLY_URL}" style="background:#0F2A22;color:#fff;padding:12px 22px;border-radius:10px;text-decoration:none;display:inline-block;font-weight:bold">Agendar mi asesoría</a>
-          </p>
-          <p>Si tienes cualquier duda, responde a este correo.</p>
-          <p style="color:#555">David Brito · AI Finance<br>${RESEND_REPLY_TO}</p>
-        </div>`,
-      text: `Hola,
-
-Confirmamos tu pago de la ${product.name}. Gracias por tu compra.
-
-Agenda tu sesión aquí: ${CALENDLY_URL}
-
-Si tienes cualquier duda, responde a este correo.
-
-David Brito · AI Finance
-${RESEND_REPLY_TO}`,
-    }
-  }
-
   const files = product.files ?? []
   const buttons = files
     .map((file) => {

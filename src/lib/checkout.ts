@@ -1,13 +1,28 @@
-// Configuración compartida de agenda y cobros (Mercado Pago).
+// Configuración compartida de cobros (Mercado Pago).
 
-export const CALENDLY_URL = 'https://calendly.com/estrategia-dbaifinance'
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string
 
-// Asesoría express (S/59). El cliente paga por Mercado Pago y, al aprobarse el
-// pago, el sitio lo redirige a Calendly para agendar. El monto real de cada
-// servicio de Nivel 2 se define DENTRO de esa asesoría.
-//
-// PRODUCCIÓN (cobro real) a S/59. Yape excluido.
-// La URL de retorno apunta a /servicios?asesoria=express (lógica en ServiciosPage).
+// Precio mostrado del Diagnóstico Financiero Express (S/59, 50% OFF de S/118).
 export const ASESORIA_EXPRESS_PRICE = 'S/59'
-export const ASESORIA_EXPRESS_LINK =
-  'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-229637cc-170b-4d63-8d15-12d8d9b24905'
+
+// Inicia el cobro del Diagnóstico Financiero Express. En vez de usar un link
+// estático de Mercado Pago, crea la preferencia al vuelo vía la edge function
+// `mp-checkout`, que define back_urls + auto_return hacia la página externa de
+// agendamiento (https://drbrito-ai.vercel.app/diagnostico-express) y la
+// notification_url hacia mp-webhook. Luego redirige al checkout de MP.
+export async function startDiagnosticoCheckout(): Promise<void> {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/mp-checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ product: 'asesoria-express' }),
+    })
+    if (!res.ok) throw new Error(`mp-checkout respondió ${res.status}`)
+    const data = await res.json()
+    if (!data.init_point) throw new Error('respuesta sin init_point')
+    window.location.assign(data.init_point as string)
+  } catch (err) {
+    console.error('No se pudo iniciar el checkout del diagnóstico:', err)
+    alert('No pudimos iniciar el pago. Inténtalo de nuevo en unos segundos.')
+  }
+}
