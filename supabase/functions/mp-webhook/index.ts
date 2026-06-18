@@ -22,6 +22,9 @@ const MP_ACCESS_TOKEN = Deno.env.get('MP_ACCESS_TOKEN')!
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')!
 const RESEND_FROM =
   Deno.env.get('RESEND_FROM') ?? 'David Brito AI Finance <onboarding@resend.dev>'
+// Buzón real al que llegan las respuestas (mejora la confianza ante los filtros).
+const RESEND_REPLY_TO =
+  Deno.env.get('RESEND_REPLY_TO') ?? 'estrategia@dbaifinance.com'
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
@@ -146,7 +149,7 @@ Deno.serve(async (req) => {
     // 5) Enviar el correo con Resend. En pruebas, TEST_EMAIL_OVERRIDE redirige
     //    todo a tu correo real (el de sandbox es ficticio y Resend lo rechaza).
     const recipient = TEST_EMAIL_OVERRIDE || email
-    const { subject, html } = buildEmail(product)
+    const { subject, html, text } = buildEmail(product)
     const sendRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -156,8 +159,10 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         from: RESEND_FROM,
         to: recipient,
+        reply_to: RESEND_REPLY_TO,
         subject,
         html,
+        text,
         ...(attachments ? { attachments } : {}),
       }),
     })
@@ -185,20 +190,33 @@ Deno.serve(async (req) => {
   }
 })
 
-function buildEmail(product: Product): { subject: string; html: string } {
+function buildEmail(
+  product: Product,
+): { subject: string; html: string; text: string } {
   if (product.calendly) {
     return {
-      subject: 'Tu asesoría está confirmada · David Brito AI Finance',
+      subject: `Pago confirmado: ${product.name} · David Brito AI Finance`,
       html: `
         <div style="font-family:Arial,Helvetica,sans-serif;line-height:1.6;color:#0F2A22">
-          <h2>¡Pago recibido! 🎉</h2>
-          <p>Gracias por adquirir la <strong>${product.name}</strong>.</p>
+          <p>Hola,</p>
+          <p>Confirmamos tu pago de la <strong>${product.name}</strong>. Gracias por tu compra.</p>
           <p>Agenda tu sesión en el siguiente enlace:</p>
           <p>
             <a href="${CALENDLY_URL}" style="background:#0F2A22;color:#fff;padding:12px 22px;border-radius:10px;text-decoration:none;display:inline-block;font-weight:bold">Agendar mi asesoría</a>
           </p>
-          <p style="color:#555">— David Brito · AI Finance</p>
+          <p>Si tienes cualquier duda, responde a este correo.</p>
+          <p style="color:#555">David Brito · AI Finance<br>${RESEND_REPLY_TO}</p>
         </div>`,
+      text: `Hola,
+
+Confirmamos tu pago de la ${product.name}. Gracias por tu compra.
+
+Agenda tu sesión aquí: ${CALENDLY_URL}
+
+Si tienes cualquier duda, responde a este correo.
+
+David Brito · AI Finance
+${RESEND_REPLY_TO}`,
     }
   }
 
@@ -217,15 +235,31 @@ function buildEmail(product: Product): { subject: string; html: string } {
     })
     .join('')
 
+  const textLinks = files
+    .map((file) => `- ${file}: ${STORAGE_BASE}/${file}`)
+    .join('\n')
+
   return {
     subject: `Tu plantilla ${product.name} está lista · David Brito AI Finance`,
     html: `
       <div style="font-family:Arial,Helvetica,sans-serif;line-height:1.6;color:#0F2A22">
-        <h2>¡Gracias por tu compra! 🎉</h2>
-        <p>Adjuntamos tu plantilla <strong>${product.name}</strong> (y su manual) en este correo.</p>
+        <p>Hola,</p>
+        <p>Gracias por tu compra. Adjuntamos tu plantilla <strong>${product.name}</strong> y su manual en este correo.</p>
         <p>También puedes descargar los archivos desde aquí:</p>
         ${buttons}
-        <p style="color:#555">— David Brito · AI Finance</p>
+        <p>Si tienes cualquier duda, responde a este correo.</p>
+        <p style="color:#555">David Brito · AI Finance<br>${RESEND_REPLY_TO}</p>
       </div>`,
+    text: `Hola,
+
+Gracias por tu compra. Adjuntamos tu plantilla ${product.name} y su manual en este correo.
+
+También puedes descargar los archivos desde aquí:
+${textLinks}
+
+Si tienes cualquier duda, responde a este correo.
+
+David Brito · AI Finance
+${RESEND_REPLY_TO}`,
   }
 }
