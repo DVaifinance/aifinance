@@ -61,14 +61,13 @@ const STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/plantillas`
 // exitoso, y este sitio disparará la descarga de la plantilla correspondiente.
 // Mientras un link esté vacío, el botón hará descarga directa (modo prueba).
 const PAYMENT_LINKS: Record<string, string> = {
-  // PRODUCCIÓN (cobro real) — temporalmente a S/2 PARA PRUEBAS. Cambiar a precio
-  // real (S/49 / S/109) regenerando el link cuando termines de probar.
+  // PRODUCCIÓN (cobro real) a precios reales: FinanStart S/49, FinanPro S/109.
   // Yape excluido (métodos de aprobación instantánea → descarga al volver).
   // La URL de retorno apunta a /servicios?plan=<slug>.
   finanstart:
-    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-61dd0029-f98b-41a9-9ebf-678885b79c32',
+    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-b05fee1d-f3ff-451b-8eee-8e161aefd5fc',
   finanpro:
-    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-32f87549-8c6e-4910-8b32-21c1aac4ca7f',
+    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-1a2a2ece-4b28-44f8-990e-66594810e5eb',
   // FinanDirectivo sigue en sandbox (está "Disponible muy pronto").
   finandirectivo:
     'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-9efc0987-a19f-4414-b5cd-9a598d3cebb3',
