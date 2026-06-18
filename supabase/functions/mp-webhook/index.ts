@@ -33,13 +33,21 @@ const TEST_EMAIL_OVERRIDE = Deno.env.get('TEST_EMAIL_OVERRIDE')
 const STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/plantillas`
 const CALENDLY_URL = 'https://calendly.com/estrategia-dbaifinance'
 
-type Product = { name: string; file?: string; calendly?: boolean }
+type Product = { name: string; files?: string[]; calendly?: boolean }
 
 // external_reference (definido al crear la preferencia) → producto.
+// `files` deben coincidir con los nombres en el bucket `plantillas` y con los
+// del frontend (plans[].files en ServiciosPage.tsx).
 const PRODUCTS: Record<string, Product> = {
-  finanstart: { name: 'FinanStart', file: 'BASICO.xlsx' },
-  finanpro: { name: 'FinanPro', file: 'MEDIANO.xlsx' },
-  finandirectivo: { name: 'FinanDirectivo', file: 'PRO.xlsx' },
+  finanstart: {
+    name: 'FinanStart',
+    files: [
+      'FinanStart_DB_AiFinance.2026.V4.xlsx',
+      'Manual_FinanStart_DB_AiFinance.2026.V4.pdf',
+    ],
+  },
+  finanpro: { name: 'FinanPro', files: ['MEDIANO.xlsx'] },
+  finandirectivo: { name: 'FinanDirectivo', files: ['PRO.xlsx'] },
   'asesoria-express': { name: 'Asesoría Express', calendly: true },
 }
 
@@ -116,13 +124,16 @@ Deno.serve(async (req) => {
       return json(200, { duplicate: String(paymentId) }) // ya enviado antes
     }
 
-    // 4) Adjuntar el Excel (si el producto es una plantilla).
+    // 4) Adjuntar todos los archivos del producto (Excel, manual PDF, etc.).
     let attachments: { filename: string; content: string }[] | undefined
-    if (product.file) {
-      const fileRes = await fetch(`${STORAGE_BASE}/${product.file}`)
-      if (fileRes.ok) {
-        const buf = new Uint8Array(await fileRes.arrayBuffer())
-        attachments = [{ filename: product.file, content: encodeBase64(buf) }]
+    if (product.files?.length) {
+      attachments = []
+      for (const file of product.files) {
+        const fileRes = await fetch(`${STORAGE_BASE}/${file}`)
+        if (fileRes.ok) {
+          const buf = new Uint8Array(await fileRes.arrayBuffer())
+          attachments.push({ filename: file, content: encodeBase64(buf) })
+        }
       }
     }
 
@@ -185,20 +196,29 @@ function buildEmail(product: Product): { subject: string; html: string } {
     }
   }
 
-  const downloadUrl = `${STORAGE_BASE}/${product.file}`
+  const files = product.files ?? []
+  const buttons = files
+    .map((file) => {
+      const downloadUrl = `${STORAGE_BASE}/${file}`
+      const label = file.toLowerCase().endsWith('.pdf')
+        ? 'Descargar manual (PDF)'
+        : 'Descargar plantilla (Excel)'
+      return `
+        <p>
+          <a href="${downloadUrl}" style="background:#0F2A22;color:#fff;padding:12px 22px;border-radius:10px;text-decoration:none;display:inline-block;font-weight:bold">${label}</a>
+        </p>
+        <p style="font-size:12px;color:#888;margin-top:-6px">Si el botón no funciona: <a href="${downloadUrl}">${downloadUrl}</a></p>`
+    })
+    .join('')
+
   return {
     subject: `Tu plantilla ${product.name} está lista · David Brito AI Finance`,
     html: `
       <div style="font-family:Arial,Helvetica,sans-serif;line-height:1.6;color:#0F2A22">
         <h2>¡Gracias por tu compra! 🎉</h2>
-        <p>Adjuntamos tu plantilla <strong>${product.name}</strong> en este correo.</p>
-        <p>También puedes descargarla desde aquí:</p>
-        <p>
-          <a href="${downloadUrl}" style="background:#0F2A22;color:#fff;padding:12px 22px;border-radius:10px;text-decoration:none;display:inline-block;font-weight:bold">Descargar mi plantilla (Excel)</a>
-        </p>
-        <p style="font-size:13px;color:#555">Si el botón no funciona, copia este enlace:<br>
-          <a href="${downloadUrl}">${downloadUrl}</a>
-        </p>
+        <p>Adjuntamos tu plantilla <strong>${product.name}</strong> (y su manual) en este correo.</p>
+        <p>También puedes descargar los archivos desde aquí:</p>
+        ${buttons}
         <p style="color:#555">— David Brito · AI Finance</p>
       </div>`,
   }
