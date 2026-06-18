@@ -66,7 +66,7 @@ const PAYMENT_LINKS: Record<string, string> = {
   // /servicios?plan=finanstart para que se disparen las descargas al volver.
   // S/49, Yape excluido (solo métodos de aprobación instantánea → descarga al volver).
   finanstart:
-    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-903fb150-6b68-4028-bb3b-b6ea4f1cdfec',
+    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-195ff9e2-a74d-4c4b-8608-d672572ed7d9',
   // PRUEBA (sandbox de Mercado Pago): paga con tarjetas de prueba. Reemplaza por
   // los links de producción cuando salgas a vivo. La URL de retorno apunta a
   // /servicios?plan=<slug>, que es donde vive la lógica de descarga.
