@@ -235,10 +235,6 @@ function LandingPage() {
               </Button>
             </div>
 
-            <p className="mt-4 text-sm text-emerald-900/65">
-              Consulta express · <span className="font-bold text-amber-600">S/59</span>
-            </p>
-
             <div className="mt-10 grid max-w-lg grid-cols-3 gap-6 border-t border-emerald-900/10 pt-8">
               {heroStats.map((stat) => (
                 <div key={stat.label}>
