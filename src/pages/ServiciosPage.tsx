@@ -61,11 +61,13 @@ const STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/plantillas`
 // exitoso, y este sitio disparará la descarga de la plantilla correspondiente.
 // Mientras un link esté vacío, el botón hará descarga directa (modo prueba).
 const PAYMENT_LINKS: Record<string, string> = {
+  // PRODUCCIÓN (cobro real). Solo FinanStart está en vivo por ahora; los demás
+  // siguen en sandbox. La URL de retorno de este link DEBE apuntar a
+  // /servicios?plan=finanstart para que se disparen las descargas al volver.
+  finanstart: 'https://mpago.la/1e4vPyw',
   // PRUEBA (sandbox de Mercado Pago): paga con tarjetas de prueba. Reemplaza por
   // los links de producción cuando salgas a vivo. La URL de retorno apunta a
   // /servicios?plan=<slug>, que es donde vive la lógica de descarga.
-  finanstart:
-    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-795fafcf-5009-48d3-96c9-ec3ec14c52ea',
   finanpro:
     'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-f965745f-36b0-47dd-a6c2-96d70b99c8c6',
   finandirectivo:
@@ -90,6 +92,13 @@ function triggerDownload(url: string, filename: string) {
     .catch(() => {
       window.location.assign(url)
     })
+}
+
+// Descarga todos los archivos asociados a un plan (Excel, manual PDF, etc.).
+function downloadPlanFiles(plan: (typeof plans)[number]) {
+  plan.files.forEach((file) => {
+    triggerDownload(`${STORAGE_BASE}/${file}`, file)
+  })
 }
 
 // Lee de la URL el plan cuyo pago fue aprobado al volver de Mercado Pago.
@@ -171,7 +180,10 @@ const plans = [
     ],
     bonus: 'Bonus gratis: Guía PDF explicativa',
     cta: 'Quiero FinanStart',
-    downloadUrl: `${STORAGE_BASE}/BASICO.xlsx`,
+    files: [
+      'FinanStart_DB_AiFinance.2026.V4.xlsx',
+      'Manual_FinanStart_DB_AiFinance.2026.V4.pdf',
+    ],
     featured: false,
   },
   {
@@ -194,7 +206,7 @@ const plans = [
     ],
     bonus: 'Bonus gratis: Guía PDF explicativa',
     cta: 'Quiero FinanPro',
-    downloadUrl: `${STORAGE_BASE}/MEDIANO.xlsx`,
+    files: ['MEDIANO.xlsx'],
     featured: true,
   },
   {
@@ -217,7 +229,7 @@ const plans = [
     ],
     bonus: 'Bonus gratis: Guía PDF + Dashboard Web con URL pública',
     cta: 'Quiero FinanDirectivo',
-    downloadUrl: `${STORAGE_BASE}/PRO.xlsx`,
+    files: ['PRO.xlsx'],
     featured: false,
   },
 ]
@@ -333,7 +345,7 @@ const faqs = [
   {
     question: '¿Cómo recibo la plantilla después de comprar?',
     answer:
-      'Inmediatamente después del pago recibes un enlace de descarga por WhatsApp o email con el archivo Excel, la guía PDF y, en FinanDirectivo, los archivos del dashboard web. La entrega es instantánea.',
+      'Inmediatamente después de aprobar el pago, el sitio te lleva de vuelta y descarga automáticamente el archivo Excel de tu plantilla. La entrega es instantánea. Si tienes cualquier inconveniente con la descarga, escríbenos por WhatsApp y te la enviamos.',
   },
   {
     question: '¿El precio de 50% OFF es permanente?',
@@ -442,8 +454,13 @@ function ServiciosPage() {
       return
     }
 
-    // Plantilla pagada: NO se descarga aquí; la enviamos por correo (webhook).
-    // El banner solo confirma el pago y avisa que llegará al correo.
+    // Plantilla pagada → descargar los archivos del plan correspondiente.
+    if (status === 'approved' && planSlug) {
+      const plan = plans.find((p) => p.slug === planSlug)
+      if (plan) {
+        downloadPlanFiles(plan)
+      }
+    }
 
     if (status || planSlug || asesoria) {
       window.history.replaceState({}, '', window.location.pathname)
@@ -471,7 +488,7 @@ function ServiciosPage() {
     if (paymentLink) {
       window.location.assign(paymentLink)
     } else {
-      triggerDownload(plan.downloadUrl, `${plan.name}.xlsx`)
+      downloadPlanFiles(plan)
     }
   }
 
@@ -527,10 +544,10 @@ function ServiciosPage() {
               ✕
             </button>
             <p className="text-sm font-semibold text-white sm:text-base">
-              ✓ Pago aprobado. Te enviamos tu plantilla <span className="text-amber-200">{paidPlanName}</span> al correo.
+              ✓ Pago aprobado. Descargando tu plantilla <span className="text-amber-200">{paidPlanName}</span>.
             </p>
             <p className="mt-1 text-xs text-emerald-50/90">
-              Revisa tu bandeja de entrada (y la carpeta de spam) en los próximos minutos.
+              Si la descarga no inicia automáticamente, revisa los permisos de descarga de tu navegador.
             </p>
           </div>
         ) : null}
