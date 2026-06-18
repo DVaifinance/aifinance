@@ -64,8 +64,9 @@ const PAYMENT_LINKS: Record<string, string> = {
   // PRODUCCIÓN (cobro real). Solo FinanStart está en vivo por ahora; los demás
   // siguen en sandbox. La URL de retorno de este link DEBE apuntar a
   // /servicios?plan=finanstart para que se disparen las descargas al volver.
+  // PRUEBA a S/2 (pref con auto_return). Volver a S/49 (pref 7e12e802) al terminar.
   finanstart:
-    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-7e12e802-d5fb-4a5d-9a2a-ad6dbcd6421b',
+    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-67918903-e8e9-43ab-a5a8-0ef2134f9aed',
   // PRUEBA (sandbox de Mercado Pago): paga con tarjetas de prueba. Reemplaza por
   // los links de producción cuando salgas a vivo. La URL de retorno apunta a
   // /servicios?plan=<slug>, que es donde vive la lógica de descarga.
