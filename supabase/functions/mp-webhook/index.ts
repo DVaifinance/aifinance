@@ -42,11 +42,17 @@ const PRODUCTS: Record<string, Product> = {
   finanstart: {
     name: 'FinanStart',
     files: [
-      'FinanStart_DB_AiFinance.2026.V4.xlsx',
-      'Manual_FinanStart_DB_AiFinance.2026.V4.pdf',
+      'FinanStart_DB_AiFinance.xlsx',
+      'Manual_FinanStart_DB_AiFinance.pdf',
     ],
   },
-  finanpro: { name: 'FinanPro', files: ['MEDIANO.xlsx'] },
+  finanpro: {
+    name: 'FinanPro',
+    files: [
+      'FinanPro_DavidBrito_DB_AiFinance.xlsx',
+      'FinanPro_Manual_DB_AiFinance.pdf',
+    ],
+  },
   finandirectivo: { name: 'FinanDirectivo', files: ['PRO.xlsx'] },
   'asesoria-express': { name: 'Asesoría Express', calendly: true },
 }

@@ -61,17 +61,15 @@ const STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/plantillas`
 // exitoso, y este sitio disparará la descarga de la plantilla correspondiente.
 // Mientras un link esté vacío, el botón hará descarga directa (modo prueba).
 const PAYMENT_LINKS: Record<string, string> = {
-  // PRODUCCIÓN (cobro real). Solo FinanStart está en vivo por ahora; los demás
-  // siguen en sandbox. La URL de retorno de este link DEBE apuntar a
-  // /servicios?plan=finanstart para que se disparen las descargas al volver.
-  // S/49, Yape excluido (solo métodos de aprobación instantánea → descarga al volver).
+  // PRODUCCIÓN (cobro real) — temporalmente a S/2 PARA PRUEBAS. Cambiar a precio
+  // real (S/49 / S/109) regenerando el link cuando termines de probar.
+  // Yape excluido (métodos de aprobación instantánea → descarga al volver).
+  // La URL de retorno apunta a /servicios?plan=<slug>.
   finanstart:
-    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-195ff9e2-a74d-4c4b-8608-d672572ed7d9',
-  // PRUEBA (sandbox de Mercado Pago): paga con tarjetas de prueba. Reemplaza por
-  // los links de producción cuando salgas a vivo. La URL de retorno apunta a
-  // /servicios?plan=<slug>, que es donde vive la lógica de descarga.
+    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-61dd0029-f98b-41a9-9ebf-678885b79c32',
   finanpro:
-    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-f965745f-36b0-47dd-a6c2-96d70b99c8c6',
+    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-32f87549-8c6e-4910-8b32-21c1aac4ca7f',
+  // FinanDirectivo sigue en sandbox (está "Disponible muy pronto").
   finandirectivo:
     'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-9efc0987-a19f-4414-b5cd-9a598d3cebb3',
 }
@@ -183,8 +181,8 @@ const plans = [
     bonus: 'Bonus gratis: Guía PDF explicativa',
     cta: 'Quiero FinanStart',
     files: [
-      'FinanStart_DB_AiFinance.2026.V4.xlsx',
-      'Manual_FinanStart_DB_AiFinance.2026.V4.pdf',
+      'FinanStart_DB_AiFinance.xlsx',
+      'Manual_FinanStart_DB_AiFinance.pdf',
     ],
     featured: false,
     comingSoon: false,
@@ -209,7 +207,10 @@ const plans = [
     ],
     bonus: 'Bonus gratis: Guía PDF explicativa',
     cta: 'Quiero FinanPro',
-    files: ['MEDIANO.xlsx'],
+    files: [
+      'FinanPro_DavidBrito_DB_AiFinance.xlsx',
+      'FinanPro_Manual_DB_AiFinance.pdf',
+    ],
     featured: true,
     comingSoon: false,
   },
@@ -549,10 +550,10 @@ function ServiciosPage() {
               ✕
             </button>
             <p className="text-sm font-semibold text-white sm:text-base">
-              ✓ Pago aprobado. Descargando tu plantilla <span className="text-amber-200">{paidPlanName}</span>.
+              ✓ Pago aprobado. Descargando tu plantilla <span className="text-amber-200">{paidPlanName}</span> y te la enviamos al correo.
             </p>
             <p className="mt-1 text-xs text-emerald-50/90">
-              Si la descarga no inicia automáticamente, revisa los permisos de descarga de tu navegador.
+              Si la descarga no inicia, revisa los permisos de tu navegador o tu bandeja de entrada (y spam).
             </p>
           </div>
         ) : null}
@@ -765,7 +766,7 @@ function ServiciosPage() {
                         Próximamente
                       </Button>
                       <p className="mt-2 text-center text-xs font-semibold text-emerald-900/45">
-                        🚧 Estamos terminando esta plantilla. Disponible muy pronto.
+                        🚧 Estamos actualizando nueva versión de esta plantilla. Disponible muy pronto.
                       </p>
                     </div>
                   ) : (
