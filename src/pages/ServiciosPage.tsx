@@ -23,6 +23,12 @@ import {
 import { Button } from '@/components/ui/button'
 import { startDiagnosticoCheckout } from '@/lib/checkout'
 
+declare global {
+  interface Window {
+    dbritoPlantillaCheckout?: (opts: { producto: string; precio?: string }) => void
+  }
+}
+
 type RemainingTime = {
   days: number
   hours: number
@@ -48,58 +54,13 @@ function pad(value: number): string {
 
 const WA_NUMBER = '51907979298'
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string
-const STORAGE_BASE = `${SUPABASE_URL}/storage/v1/object/public/plantillas`
-
-// === Mercado Pago: Links de pago por plantilla =============================
-// Pega aquí el "Link de pago" que generes en tu panel de Mercado Pago para
-// cada plantilla. En CADA link, configura la "URL de retorno" (back URL) de
-// pago aprobado apuntando a este sitio con el parámetro `plan`, por ejemplo:
-//
-//   https://tu-dominio.com/?plan=finanstart
-//
-// Mercado Pago añadirá automáticamente `&status=approved` al volver de un pago
-// exitoso, y este sitio disparará la descarga de la plantilla correspondiente.
-// Mientras un link esté vacío, el botón hará descarga directa (modo prueba).
-const PAYMENT_LINKS: Record<string, string> = {
-  // PRODUCCIÓN (cobro real) a precios reales: FinanStart S/49, FinanPro S/109.
-  // Yape excluido (métodos de aprobación instantánea → descarga al volver).
-  // La URL de retorno apunta a /servicios?plan=<slug>.
-  finanstart:
-    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-b05fee1d-f3ff-451b-8eee-8e161aefd5fc',
-  finanpro:
-    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-1a2a2ece-4b28-44f8-990e-66594810e5eb',
-  // FinanDirectivo sigue en sandbox (está "Disponible muy pronto").
-  finandirectivo:
-    'https://www.mercadopago.com.pe/checkout/v1/redirect?pref_id=3410303242-9efc0987-a19f-4414-b5cd-9a598d3cebb3',
-}
-
-// Fuerza la descarga del archivo. Intenta vía blob (renombra el archivo) y, si
-// el navegador lo bloquea por CORS, cae a abrir la URL directamente.
-function triggerDownload(url: string, filename: string) {
-  fetch(url)
-    .then((res) => res.blob())
-    .then((blob) => {
-      const objectUrl = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = objectUrl
-      link.download = filename
-      document.body.appendChild(link)
-      link.click()
-      link.remove()
-      URL.revokeObjectURL(objectUrl)
-    })
-    .catch(() => {
-      window.location.assign(url)
-    })
-}
-
-// Descarga todos los archivos asociados a un plan (Excel, manual PDF, etc.).
-function downloadPlanFiles(plan: (typeof plans)[number]) {
-  plan.files.forEach((file) => {
-    triggerDownload(`${STORAGE_BASE}/${file}`, file)
-  })
-}
+// Pago + entrega de plantillas: 100% vía el widget de checkout
+// (window.dbritoPlantillaCheckout, cargado en index.html desde jsDelivr):
+//   modal (nombre/correo/sector/teléfono) -> workflow n8n "Crear Link Pago
+//   Plantilla WEB" -> Mercado Pago -> el webhook de MP verifica el pago real
+//   -> "Entregar Plantilla" envía Excel + manual por correo y registra el lead.
+// Sin descarga client-side: el archivo es un producto pagado y solo se entrega
+// tras confirmar el pago.
 
 // Lee de la URL el plan cuyo pago fue aprobado al volver de Mercado Pago.
 function getApprovedPlanName(): string | null {
@@ -231,12 +192,13 @@ const plans = [
       'Dashboard ejecutivo con 4 gráficos en Excel',
       'Hoja de presentación bancaria lista para imprimir',
       'Dashboard web interactivo con URL pública (Apps Script)',
+      'Soporte disponible vía estrategia@dbaifinance.com, con respuesta dentro de 48 horas hábiles.',
     ],
-    bonus: 'Bonus gratis: Guía PDF + Dashboard Web con URL pública',
+    bonus: 'Incluye guía PDF completa + sesión de implementación con David Brito.',
     cta: 'Quiero FinanDirectivo',
     files: ['PRO.xlsx'],
     featured: false,
-    comingSoon: true,
+    comingSoon: false,
   },
 ]
 
@@ -446,22 +408,11 @@ function ServiciosPage() {
     return () => clearInterval(intervalId)
   }, [targetDate])
 
-  // Al volver desde Mercado Pago: si el pago fue aprobado, descarga la plantilla
-  // del plan indicado en la URL y limpia los parámetros para no redescargar.
+  // Limpia parámetros sueltos de retorno de pago en la URL (el pago y la entrega
+  // ahora los maneja el widget de checkout -> webhook de Mercado Pago -> correo).
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
-    const status = params.get('status') ?? params.get('collection_status')
-    const planSlug = params.get('plan')
-
-    // Plantilla pagada → descargar los archivos del plan correspondiente.
-    if (status === 'approved' && planSlug) {
-      const plan = plans.find((p) => p.slug === planSlug)
-      if (plan) {
-        downloadPlanFiles(plan)
-      }
-    }
-
-    if (status || planSlug) {
+    if (params.get('status') || params.get('collection_status') || params.get('plan')) {
       window.history.replaceState({}, '', window.location.pathname)
     }
   }, [])
@@ -480,14 +431,18 @@ function ServiciosPage() {
     return () => clearTimeout(timeoutId)
   }, [paidPlanName])
 
-  // Inicia el cobro en Mercado Pago. Si el plan aún no tiene link configurado,
-  // hace descarga directa (modo prueba) para no bloquear el flujo.
+  // Abre el modal de checkout (nombre/correo/sector/teléfono) -> genera el link de
+  // Mercado Pago vía n8n -> tras confirmar el pago, "Entregar Plantilla" envía los
+  // archivos por correo. Si el widget no cargó, deriva a WhatsApp como respaldo.
   function handleBuy(plan: (typeof plans)[number]) {
-    const paymentLink = PAYMENT_LINKS[plan.slug]
-    if (paymentLink) {
-      window.location.assign(paymentLink)
+    if (typeof window.dbritoPlantillaCheckout === 'function') {
+      window.dbritoPlantillaCheckout({ producto: plan.slug, precio: plan.offerPrice })
     } else {
-      downloadPlanFiles(plan)
+      window.location.assign(
+        `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(
+          `Hola David, quiero comprar la plantilla ${plan.name} (${plan.offerPrice}).`,
+        )}`,
+      )
     }
   }
 
