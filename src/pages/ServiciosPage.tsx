@@ -194,7 +194,7 @@ const plans = [
       'Dashboard web interactivo con URL pública (Apps Script)',
       'Soporte disponible vía estrategia@dbaifinance.com, con respuesta dentro de 48 horas hábiles.',
     ],
-    bonus: 'Incluye guía PDF completa + sesión de implementación con David Brito.',
+    bonus: 'Bonus gratis: Incluye guía PDF completa + sesión de implementación con David Brito.',
     cta: 'Quiero FinanDirectivo',
     files: ['PRO.xlsx'],
     featured: false,
