@@ -2,8 +2,8 @@
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string
 
-// Precio mostrado del Diagnóstico Financiero Express (S/59, 50% OFF de S/118).
-export const ASESORIA_EXPRESS_PRICE = 'S/59'
+// Precio mostrado del Diagnóstico Financiero Express (precio fijo, sin oferta).
+export const ASESORIA_EXPRESS_PRICE = 'S/118'
 
 // Inicia el cobro del Diagnóstico Financiero Express. En vez de usar un link
 // estático de Mercado Pago, crea la preferencia al vuelo vía la edge function

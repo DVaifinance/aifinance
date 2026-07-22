@@ -866,12 +866,8 @@ function ServiciosPage() {
                 {/* CUADRO 2 · PRECIO + CTA */}
                 <div className="flex flex-col justify-center bg-[#0F2A22] p-7 text-white sm:p-9">
                   <div className="flex items-end gap-3">
-                    <span className="font-sans text-5xl font-black tracking-tight">S/59</span>
-                    <span className="mb-1.5 text-2xl font-bold text-white/40 line-through">S/118</span>
+                    <span className="font-sans text-5xl font-black tracking-tight">S/118</span>
                   </div>
-                  <p className="mt-3 inline-flex w-fit items-center gap-2 rounded-full bg-amber-400 px-3 py-1.5 text-xs font-black tracking-[0.08em] text-emerald-950 uppercase">
-                    <Sparkles className="size-3.5" /> 50% OFF · Solo junio 2026
-                  </p>
                   <p className="mt-5 text-sm leading-relaxed text-white/70">
                     Aplicable como crédito a tu Plan de Negocio Integral, Plan
                     Financiero Bancario o Reestructuración de Deuda.

@@ -33,8 +33,7 @@ type Catalog = { title: string; price: number }
 // external_reference → datos del producto. Debe coincidir con PRODUCTS en
 // mp-webhook para que la conciliación posterior funcione.
 const PRODUCTS: Record<string, Catalog> = {
-  // PRUEBA: cobro a S/2. Para producción, vuelve a price: 59.
-  'asesoria-express': { title: 'Diagnóstico Financiero Express', price: 2 },
+  'asesoria-express': { title: 'Diagnóstico Financiero Express', price: 118 },
 }
 
 function json(status: number, body: unknown): Response {
