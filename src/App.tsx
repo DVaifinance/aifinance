@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 
+import DemoPage from '@/pages/DemoPage'
 import LandingPage from '@/pages/LandingPage'
 import ServiciosPage from '@/pages/ServiciosPage'
 
@@ -20,6 +21,8 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/servicios" element={<ServiciosPage />} />
+        {/* Destino del link en la bio de Instagram: demo en video de las plantillas. */}
+        <Route path="/demo" element={<DemoPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>
