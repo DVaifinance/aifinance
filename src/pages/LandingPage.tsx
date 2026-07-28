@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ArrowRight,
@@ -7,6 +7,7 @@ import {
   Landmark,
   Mail,
   MapPin,
+  Menu,
   MessageCircle,
   Phone,
   Scale,
@@ -14,6 +15,7 @@ import {
   Settings,
   Sparkles,
   TrendingUp,
+  X,
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -168,15 +170,28 @@ function scrollToId(id: string) {
 function LandingPage() {
   useInView()
 
+  // Menú móvil: en pantallas menores a lg el nav horizontal se oculta, así que
+  // esta es la única navegación disponible (y la mayoría del tráfico es móvil).
+  const [menuAbierto, setMenuAbierto] = useState(false)
+
   useEffect(() => {
     document.title = 'David Brito · AI Finance — Asesoría Financiera Estratégica'
   }, [])
+
+  useEffect(() => {
+    if (!menuAbierto) return
+    const cerrarConEscape = (evento: KeyboardEvent) => {
+      if (evento.key === 'Escape') setMenuAbierto(false)
+    }
+    window.addEventListener('keydown', cerrarConEscape)
+    return () => window.removeEventListener('keydown', cerrarConEscape)
+  }, [menuAbierto])
 
   return (
     <div className="relative min-h-screen bg-[#0F2A22] text-[#FFFFFF]">
       <div className="bg-[#FAFAF7] text-[#0F2A22]">
         <header className="relative z-20 mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-5 sm:px-8">
-          <Link to="/" className="inline-flex items-center transition hover:opacity-80" aria-label="David Brito · AI Finance — Inicio">
+          <Link to="/" className="inline-flex shrink-0 items-center transition hover:opacity-80" aria-label="David Brito · AI Finance — Inicio">
             <img src="/logo-green.svg" alt="David Brito · AI Finance" className="h-9 w-auto sm:h-10" />
           </Link>
 
@@ -203,13 +218,85 @@ function LandingPage() {
             )}
           </nav>
 
+          {/* En móvil el botón largo no entra junto al logo: se muestra el
+              hamburguesa y el CTA vive dentro del panel (además del hero). */}
           <Button
             onClick={() => void startDiagnosticoCheckout()}
-            className="h-10 rounded-xl bg-[#0F2A22] px-4 text-sm font-semibold text-white transition hover:bg-[#15392c]"
+            className="hidden h-10 rounded-xl bg-[#0F2A22] px-4 text-sm font-semibold text-white transition hover:bg-[#15392c] lg:inline-flex"
             size="lg"
           >
             Diagnóstico Financiero Express
           </Button>
+
+          <button
+            type="button"
+            onClick={() => setMenuAbierto((abierto) => !abierto)}
+            aria-label={menuAbierto ? 'Cerrar menú' : 'Abrir menú'}
+            aria-expanded={menuAbierto}
+            aria-controls="menu-movil"
+            className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl text-[#0F2A22] transition hover:bg-emerald-900/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0F2A22] lg:hidden"
+          >
+            {menuAbierto ? (
+              <X aria-hidden="true" className="size-6" />
+            ) : (
+              <Menu aria-hidden="true" className="size-6" />
+            )}
+          </button>
+
+          {menuAbierto && (
+            <>
+              {/* Fondo: cierra el menú al tocar fuera. */}
+              <div
+                onClick={() => setMenuAbierto(false)}
+                aria-hidden="true"
+                className="fixed inset-0 z-10 bg-[#0F2A22]/25 lg:hidden"
+              />
+
+              <div
+                id="menu-movil"
+                className="absolute inset-x-5 top-full z-20 mt-1 overflow-hidden rounded-2xl border border-emerald-900/10 bg-white shadow-[0_18px_45px_-12px_rgba(15,42,34,0.3)] sm:inset-x-8 lg:hidden"
+              >
+                <nav className="flex flex-col p-2">
+                  {navItems.map((item) =>
+                    item.to ? (
+                      <Link
+                        key={item.to}
+                        to={item.to}
+                        onClick={() => setMenuAbierto(false)}
+                        className="flex min-h-12 items-center rounded-xl px-4 text-base font-medium text-emerald-900/80 transition hover:bg-amber-300/25 hover:text-[#0F2A22]"
+                      >
+                        {item.label}
+                      </Link>
+                    ) : (
+                      <button
+                        key={item.target}
+                        type="button"
+                        onClick={() => {
+                          setMenuAbierto(false)
+                          scrollToId(item.target!)
+                        }}
+                        className="flex min-h-12 items-center rounded-xl px-4 text-left text-base font-medium text-emerald-900/80 transition hover:bg-amber-300/25 hover:text-[#0F2A22]"
+                      >
+                        {item.label}
+                      </button>
+                    ),
+                  )}
+                </nav>
+
+                <div className="border-t border-emerald-900/10 p-3">
+                  <Button
+                    onClick={() => {
+                      setMenuAbierto(false)
+                      void startDiagnosticoCheckout()
+                    }}
+                    className="h-12 w-full rounded-xl bg-[#0F2A22] text-sm font-semibold text-white transition hover:bg-[#15392c]"
+                  >
+                    Diagnóstico Financiero Express
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
         </header>
 
         {/* ── HERO ── */}
