@@ -17,17 +17,38 @@ function waLink(text: string): string {
 
 // Demos publicados en YouTube (dominio nocookie: no deja cookies de seguimiento
 // hasta que la persona le da play).
-const FINANPRO_EMBED = 'https://www.youtube-nocookie.com/embed/JhU13p7SoQM'
+const FINANPRO_EMBED = 'https://www.youtube-nocookie.com/embed/HN31dXSbgJs'
 const FINANDIRECTIVO_EMBED = 'https://www.youtube-nocookie.com/embed/0Z61Q0VUZM8'
 
 const IFRAME_ALLOW =
   'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
 
+// Lo que se ve en el demo de FinanPro, en el orden en que aparece en el video.
 const finanproHighlights = [
-  'Registras tus ventas y gastos del día y el Estado de Resultados se arma solo.',
-  'Comparas lo tuyo con lo que declara tu contador y la plantilla te avisa si algo no cuadra.',
-  'Ratios con semáforo: ves en verde o en rojo dónde ganas y dónde se te va la plata.',
-  'Incluye manual en PDF paso a paso, así que la usas desde el primer día.',
+  {
+    lead: 'Una sola hoja de registro',
+    rest: ': anotas ingresos y gastos (acepta soles y dólares con tipo de cambio automático) y todo lo demás se arma solo.',
+  },
+  {
+    lead: 'Estado de Resultados automático',
+    rest: ': utilidad neta y margen mes a mes — en el caso del video: S/ 40,365 de utilidad y 17% de margen.',
+  },
+  {
+    lead: 'Balance que se verifica solo',
+    rest: ': la plantilla te confirma al instante si tus números cuadran.',
+  },
+  {
+    lead: 'Flujo de caja proyectado a 3 meses',
+    rest: ': simula una compra grande y ve ANTES si te faltará plata — y cómo resolverlo con financiamiento.',
+  },
+  {
+    lead: '10 ratios con semáforo',
+    rest: ' verde/ámbar/rojo: dónde estás sano y dónde actuar.',
+  },
+  {
+    lead: 'Dashboard ejecutivo',
+    rest: ' con gráficos, listo para tomar decisiones.',
+  },
 ]
 
 // Marco 16:9 con padding-top en vez de aspect-ratio: es lo más compatible con
@@ -97,22 +118,27 @@ function DemoPage() {
         <section className="reveal reveal-delay-3 mt-9 overflow-hidden rounded-[2rem] border border-emerald-900/10 bg-white shadow-[0_25px_70px_-50px_rgba(15,42,34,0.35)]">
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b border-emerald-900/8 px-5 py-4 sm:px-7">
             <h2 className="font-display text-2xl text-[#0F2A22]">FinanPro</h2>
-            <p className="text-sm text-emerald-900/55">Caso real: un restaurante · 5:37 min</p>
+            <p className="text-sm text-emerald-900/55">
+              Caso real completo: un taller mecánico (Taller AutoMax) · 11 min
+            </p>
           </div>
 
           <VideoFrame
             src={FINANPRO_EMBED}
-            title="Demo de la plantilla FinanPro — caso real de un restaurante"
+            title="Demo completo de la plantilla FinanPro — caso real de un taller mecánico"
           />
 
           <ul className="px-5 py-5 sm:px-7 sm:py-6">
             {finanproHighlights.map((item) => (
               <li
-                key={item}
+                key={item.lead}
                 className="flex items-start gap-3 border-b border-emerald-900/8 py-3 text-base leading-relaxed text-emerald-900/80 last:border-b-0 last:pb-0"
               >
                 <Check className="mt-1 size-4 shrink-0 text-amber-500" />
-                <span>{item}</span>
+                <span>
+                  <span className="font-semibold text-[#0F2A22]">{item.lead}</span>
+                  {item.rest}
+                </span>
               </li>
             ))}
           </ul>
