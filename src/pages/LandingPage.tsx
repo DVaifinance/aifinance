@@ -152,8 +152,10 @@ const experience = [
   },
 ]
 
-const navItems = [
+// `target` = ancla a una sección de esta página · `to` = ruta del sitio.
+const navItems: { label: string; target?: string; to?: string }[] = [
   { label: 'Servicios', target: 'servicios' },
+  { label: 'Demo', to: '/demo' },
   { label: 'Metodología', target: 'metodologia' },
   { label: 'Experiencia', target: 'experiencia' },
   { label: 'Contacto', target: 'contacto' },
@@ -179,16 +181,26 @@ function LandingPage() {
           </Link>
 
           <nav className="hidden items-center gap-8 lg:flex">
-            {navItems.map((item) => (
-              <button
-                key={item.target}
-                type="button"
-                onClick={() => scrollToId(item.target)}
-                className="text-sm font-medium text-emerald-900/70 transition hover:text-[#0F2A22]"
-              >
-                {item.label}
-              </button>
-            ))}
+            {navItems.map((item) =>
+              item.to ? (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className="text-sm font-medium text-emerald-900/70 transition hover:text-[#0F2A22]"
+                >
+                  {item.label}
+                </Link>
+              ) : (
+                <button
+                  key={item.target}
+                  type="button"
+                  onClick={() => scrollToId(item.target!)}
+                  className="text-sm font-medium text-emerald-900/70 transition hover:text-[#0F2A22]"
+                >
+                  {item.label}
+                </button>
+              ),
+            )}
           </nav>
 
           <Button
