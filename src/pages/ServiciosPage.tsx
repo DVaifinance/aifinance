@@ -74,26 +74,18 @@ function getApprovedPlanName(): string | null {
   return null
 }
 
-// Ventana de oferta de 6 días que se fija en la primera visita y persiste entre
-// recargas (no se reinicia al refrescar la página).
-const OFFER_WINDOW_MS = 6 * 24 * 60 * 60 * 1000
-const OFFER_DEADLINE_KEY = 'aifinance:offer-deadline'
-
-function getOfferDeadline(): number {
-  if (typeof window === 'undefined') return Date.now() + OFFER_WINDOW_MS
-
-  const stored = window.localStorage.getItem(OFFER_DEADLINE_KEY)
-  const parsed = stored ? Number(stored) : NaN
-
-  // Reutiliza la fecha guardada mientras siga vigente; si no, abre una ventana nueva.
-  if (Number.isFinite(parsed) && parsed > Date.now()) {
-    return parsed
-  }
-
-  const deadline = Date.now() + OFFER_WINDOW_MS
-  window.localStorage.setItem(OFFER_DEADLINE_KEY, String(deadline))
-  return deadline
-}
+// Fecha REAL en la que sube el precio: 30 de agosto de 2026, 00:00 hora de Lima.
+// Es una fecha fija y global (antes era una ventana rodante de 6 días por
+// visitante guardada en localStorage: cada persona veía su propio contador y se
+// renovaba solo, así que nunca vencía de verdad).
+//
+// El precio que se cobra HOY es el de `currentPrice`; `futurePrice` es lo que
+// costará desde esta fecha. No hay descuento sobre un precio pasado: el ancla es
+// la subida futura, que sí es real. Si David mueve la fecha, se cambia aquí
+// y hay que moverla TAMBIÉN en los 2 nodos del auto-switch de n8n
+// (`Decide Pago Plantilla` en canales y `Decide` en el checkout web),
+// o el bot y la web cotizarán distinto de lo que cobra Mercado Pago.
+const PRICE_INCREASE_AT = new Date('2026-08-30T00:00:00-05:00').getTime()
 
 const credibilityItems = [
   {
@@ -129,8 +121,8 @@ const plans = [
     slug: 'finanstart',
     tagline: 'Tu primer control financiero',
     description: 'Deja de adivinar cuánto ganas.',
-    regularPrice: 'S/98',
-    offerPrice: 'S/49',
+    currentPrice: 'S/98',
+    futurePrice: 'S/196',
     audience: 'Para ti si facturas hasta S/50k/año',
     features: [
       'Registro mensual de ingresos y gastos',
@@ -154,8 +146,8 @@ const plans = [
     slug: 'finanpro',
     tagline: 'Control y proyección para negocios en expansión',
     description: 'Sabe adónde va tu dinero.',
-    regularPrice: 'S/218',
-    offerPrice: 'S/109',
+    currentPrice: 'S/218',
+    futurePrice: 'S/436',
     audience: 'Para ti si facturas S/50k-S/150k/año',
     features: [
       'Todo lo de FinanStart +',
@@ -181,8 +173,8 @@ const plans = [
     slug: 'finandirectivo',
     tagline: 'Finanzas de alta gerencia',
     description: 'La visión financiera que tienen las grandes empresas, ahora en la tuya.',
-    regularPrice: 'S/358',
-    offerPrice: 'S/179',
+    currentPrice: 'S/358',
+    futurePrice: 'S/716',
     audience: 'Para ti si facturas más de S/150k/año',
     features: [
       'Todo lo de FinanPro +',
@@ -238,8 +230,8 @@ const comparisonRows = [
 ]
 
 // === Nivel 2 · Servicios puntuales =========================================
-// Entregables concretos, pago 100% adelantado. Precio con 20% de descuento de
-// lanzamiento (se muestra el precio original tachado + el precio con descuento).
+// Entregables concretos, pago 100% adelantado. Se muestra el precio de
+// lanzamiento vigente (lo que cobra Mercado Pago hoy) y la subida del 30-ago.
 const puntualServices = [
   {
     code: '2A',
@@ -316,9 +308,9 @@ const faqs = [
       'Inmediatamente después de aprobar el pago, el sitio te lleva de vuelta y descarga automáticamente el archivo Excel de tu plantilla. La entrega es instantánea. Si tienes cualquier inconveniente con la descarga, escríbenos por WhatsApp y te la enviamos.',
   },
   {
-    question: '¿El precio de 50% OFF es permanente?',
+    question: '¿El precio de lanzamiento es permanente?',
     answer:
-      'No. Es una oferta de lanzamiento válida solo esta semana. El precio normal de FinanStart es S/98, FinanPro S/218 y FinanDirectivo S/358. Una vez terminada la oferta, el precio vuelve a su valor normal sin excepciones.',
+      'No. Es el precio de lanzamiento y se mantiene hasta el 29 de agosto de 2026. Desde el 30 de agosto, FinanStart pasa a S/196, FinanPro a S/436 y FinanDirectivo a S/716. Si compras antes, el precio de lanzamiento es el que pagas.',
   },
 ]
 
@@ -388,7 +380,7 @@ function Countdown({
 }
 
 function ServiciosPage() {
-  const [targetDate] = useState(getOfferDeadline)
+  const [targetDate] = useState(PRICE_INCREASE_AT)
   const [remainingTime, setRemainingTime] = useState<RemainingTime>(() =>
     getRemainingTime(targetDate),
   )
@@ -436,11 +428,11 @@ function ServiciosPage() {
   // archivos por correo. Si el widget no cargó, deriva a WhatsApp como respaldo.
   function handleBuy(plan: (typeof plans)[number]) {
     if (typeof window.dbritoPlantillaCheckout === 'function') {
-      window.dbritoPlantillaCheckout({ producto: plan.slug, precio: plan.offerPrice })
+      window.dbritoPlantillaCheckout({ producto: plan.slug, precio: plan.currentPrice })
     } else {
       window.location.assign(
         `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(
-          `Hola David, quiero comprar la plantilla ${plan.name} (${plan.offerPrice}).`,
+          `Hola David, quiero comprar la plantilla ${plan.name} (${plan.currentPrice}).`,
         )}`,
       )
     }
@@ -509,7 +501,7 @@ function ServiciosPage() {
         <section className="mx-auto flex min-h-[calc(100vh-84px)] w-full max-w-7xl items-center justify-center px-5 pb-14 pt-6 sm:px-8 sm:pb-20">
           <div className="w-full max-w-4xl text-center">
           <p className="reveal mx-auto inline-flex items-center rounded-full bg-amber-300/30 px-4 py-2 text-xs font-bold tracking-[0.14em] text-emerald-950 uppercase sm:text-sm">
-            Oferta de lanzamiento · 50% OFF
+            Precio de lanzamiento · sube el 30 de agosto
           </p>
 
           <h1 className="reveal reveal-delay-1 mt-8 font-display text-[2.35rem] leading-tight tracking-tight text-[#0F2A22] sm:text-[4rem] sm:leading-[0.95] md:text-[5.4rem]">
@@ -526,7 +518,7 @@ function ServiciosPage() {
 
           <div className="reveal reveal-delay-3 mx-auto mt-10 max-w-xl rounded-2xl border border-emerald-900/10 bg-white p-4 shadow-[0_25px_70px_-50px_rgba(15,42,34,0.35)]">
             <Countdown
-              label="La oferta termina en"
+              label="El precio sube en"
               time={remainingTime}
               cellClassName="rounded-xl border border-emerald-900/8 bg-[#FAF6EC] p-2 sm:p-3"
               labelClassName="text-amber-600"
@@ -536,7 +528,7 @@ function ServiciosPage() {
           </div>
 
           <p className="reveal reveal-delay-4 mx-auto mt-4 inline-flex rounded-xl bg-red-500 px-4 py-2 text-xs font-semibold text-white sm:text-sm">
-            Descuento del 50% · Solo esta semana · El precio sube pronto
+            Precio de lanzamiento · El 30 de agosto sube al doble
           </p>
 
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -669,15 +661,15 @@ function ServiciosPage() {
                 <p className="text-lg text-emerald-900/55">{plan.description}</p>
 
                 <div className="mt-8">
-                  <p className="text-2xl text-zinc-400 line-through">
-                    Precio normal: {plan.regularPrice}
+                  <p className="text-lg font-semibold text-amber-600">
+                    Desde el 30 de agosto: {plan.futurePrice}
                   </p>
                   <div className="mt-2 flex items-center gap-3">
                     <p className="font-sans text-5xl font-black tracking-tight text-[#0F2A22] sm:text-6xl">
-                      {plan.offerPrice}
+                      {plan.currentPrice}
                     </p>
-                    <span className="rounded-lg bg-red-500/10 px-3 py-2 text-xs font-black tracking-[0.14em] text-red-600 uppercase">
-                      50% off
+                    <span className="rounded-lg bg-amber-400/20 px-3 py-2 text-xs font-black tracking-[0.14em] text-amber-700 uppercase">
+                      Precio de lanzamiento
                     </span>
                   </div>
                 </div>
@@ -754,15 +746,15 @@ function ServiciosPage() {
               </div>
               <div className="px-4 py-5 text-center">
                 <p className="text-lg font-black text-[#0F2A22] uppercase">FinanStart</p>
-                <p className="text-lg font-bold text-amber-600">S/49</p>
+                <p className="text-lg font-bold text-amber-600">S/98</p>
               </div>
               <div className="px-4 py-5 text-center">
                 <p className="text-lg font-black text-[#0F2A22] uppercase">FinanPro</p>
-                <p className="text-lg font-bold text-amber-600">S/109</p>
+                <p className="text-lg font-bold text-amber-600">S/218</p>
               </div>
               <div className="px-4 py-5 text-center">
                 <p className="text-lg font-black text-[#0F2A22] uppercase">FinanDirectivo</p>
-                <p className="text-lg font-bold text-amber-600">S/179</p>
+                <p className="text-lg font-bold text-amber-600">S/358</p>
               </div>
             </div>
 

@@ -33,15 +33,17 @@ const heroStats = [
 ]
 
 // Resumen de las plantillas que viven en /servicios. Cada nivel se adapta al
-// tamaño de la empresa y mantiene la oferta de lanzamiento del 50% OFF.
+// tamaño de la empresa. Se muestra el precio de lanzamiento vigente (lo que
+// cobra Mercado Pago hoy) y la subida real del 30-ago-2026. Mantener sincronizado
+// con ServiciosPage.tsx y con los 2 nodos del auto-switch de n8n.
 const planSummaries = [
   {
     level: 'Nivel 01',
     name: 'FinanStart',
     tagline: 'Tu primer control financiero',
     audience: 'Facturas hasta S/50k/año',
-    regularPrice: 'S/98',
-    offerPrice: 'S/49',
+    currentPrice: 'S/98',
+    futurePrice: 'S/196',
     highlights: [
       'Estado de Resultados automático',
       'Balance General básico',
@@ -54,8 +56,8 @@ const planSummaries = [
     name: 'FinanPro',
     tagline: 'Control y proyección en expansión',
     audience: 'Facturas S/50k – S/150k/año',
-    regularPrice: 'S/218',
-    offerPrice: 'S/109',
+    currentPrice: 'S/218',
+    futurePrice: 'S/436',
     highlights: [
       'Todo lo de FinanStart +',
       'Flujo de caja proyectado a 3 meses',
@@ -68,8 +70,8 @@ const planSummaries = [
     name: 'FinanDirectivo',
     tagline: 'Finanzas de alta gerencia',
     audience: 'Facturas más de S/150k/año',
-    regularPrice: 'S/358',
-    offerPrice: 'S/179',
+    currentPrice: 'S/358',
+    futurePrice: 'S/716',
     highlights: [
       'Todo lo de FinanPro +',
       'Flujo operativo, inversión y financiamiento',
@@ -380,7 +382,7 @@ function LandingPage() {
               <div className="mt-7 flex justify-center">
                 <span className="inline-flex items-center gap-2 rounded-full bg-amber-300/30 px-5 py-2.5 text-sm font-bold tracking-[0.02em] text-emerald-950">
                   <Sparkles className="size-4 text-amber-600" />
-                  Oferta de lanzamiento · 50% OFF · solo esta semana
+                  Precio de lanzamiento · sube el 30 de agosto
                 </span>
               </div>
             </div>
@@ -416,15 +418,15 @@ function LandingPage() {
                   </p>
 
                   <div className="mt-5">
-                    <p className="text-sm text-zinc-400 line-through">
-                      Antes {plan.regularPrice}
+                    <p className="text-sm font-semibold text-amber-600">
+                      Desde el 30 de agosto: {plan.futurePrice}
                     </p>
                     <div className="mt-1 flex items-center gap-2">
                       <p className="font-sans text-4xl font-black tracking-tight text-[#0F2A22]">
-                        {plan.offerPrice}
+                        {plan.currentPrice}
                       </p>
-                      <span className="rounded-md bg-red-500/10 px-2 py-1 text-[10px] font-black tracking-[0.08em] text-red-600 uppercase">
-                        50% off
+                      <span className="rounded-md bg-amber-400/20 px-2 py-1 text-[10px] font-black tracking-[0.08em] text-amber-700 uppercase">
+                        Lanzamiento
                       </span>
                     </div>
                   </div>
