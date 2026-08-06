@@ -34,20 +34,28 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
 
-    <!-- Widget David Brito · AI Finance · agente IA conversacional -->
-    <script>
-      window.dbritoAgentConfig = {
-        n8nBase:        'https://meta.ijvagency.com',
-        timeoutMs:      45000,
-        maxRetries:     1,
-        calendlyUrl:    'https://calendly.com/estrategia-dbaifinance/30min',
-        whatsappNumber: '51907979298'
-      };
-    </script>
-    <script src="https://cdn.jsdelivr.net/gh/nachojr2003/david-brito-ai-finance@main/widget/dbrito-agent.js" defer></script>
-    <!-- Fin widget -->
+    <!--
+      Widget del agente IA · DESACTIVADO 2026-08-05 (cliente en pausa hasta el 1-sep-2026).
+      El workflow `Agent - Chat [DBRITO]` está apagado en n8n, así que el chat respondería
+      con un error a cualquier visitante. Se retira el script en vez de dejar una burbuja rota.
+      PARA REACTIVAR: reactivar primero el workflow en n8n y ManyChat, y recién ahí descomentar.
 
-    <!-- Checkout de plantillas N1 (FinanStart / FinanPro / FinanDirectivo) -->
+      <script>
+        window.dbritoAgentConfig = {
+          n8nBase:        'https://meta.ijvagency.com',
+          timeoutMs:      45000,
+          maxRetries:     1,
+          calendlyUrl:    'https://calendly.com/estrategia-dbaifinance/30min',
+          whatsappNumber: '51907979298'
+        };
+      </script>
+      <script src="https://cdn.jsdelivr.net/gh/nachojr2003/david-brito-ai-finance@main/widget/dbrito-agent.js" defer></script>
+    -->
+
+    <!-- Checkout de plantillas N1 (FinanStart / FinanPro / FinanDirectivo)
+         SE MANTIENE ACTIVO durante la pausa: la compra orgánica por la web sigue
+         funcionando (workflow `Crear Link Pago Plantilla WEB` + los webhooks de MP
+         + `Entregar Plantilla` quedaron encendidos a propósito). -->
     <script>
       window.dbritoCheckoutConfig = { n8nBase: 'https://meta.ijvagency.com' };
     </script>
